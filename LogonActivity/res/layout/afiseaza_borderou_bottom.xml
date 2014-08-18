@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <com.distributieTest.view.ProgressWheel
+        android:id="@+id/pw_spinner"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        ProgressWheel:barColor="#009ACD"
+        ProgressWheel:barLength="80dp"
+        ProgressWheel:barWidth="20dp"
+        ProgressWheel:rimColor="#8FC7CC"
+        ProgressWheel:rimWidth="20dp"
+        ProgressWheel:spinSpeed="3dp"
+        ProgressWheel:textColor="#222222"
+        ProgressWheel:textSize="14sp" />
+
+</LinearLayout>

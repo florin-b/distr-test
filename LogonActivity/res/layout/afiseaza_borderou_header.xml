@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/userLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal" >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.6"
+        android:orientation="vertical" >
+
+        <Spinner
+            android:id="@+id/spinnerBorderouri"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="10dip"
+            android:background="@drawable/spinner_style_1" />
+
+        <TextView
+            android:id="@+id/textStartBorderou"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="10dip"
+            android:gravity="bottom|left"
+            android:textColor="@color/rowColor7"
+            android:textSize="25sp"
+            android:textStyle="normal"
+            android:typeface="sans" />
+
+        <ListView
+            android:id="@+id/listEvenimente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="10dip" />
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/evenimenteLayout"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_marginRight="10dip"
+        android:layout_weight="0.4"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/livrareLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/livrariLayout"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:layout_weight="0.57"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:layout_marginTop="10dip"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/textSelectedBorderou"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:background="#009ACD"
+                    android:textColor="#E7FEFF"
+                    android:textSize="20sp"
+                    android:typeface="serif" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dip"
+                    android:background="#009ACD" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/listFacturiBorderou"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dip"
+                android:layout_marginLeft="10dip"
+                android:layout_marginTop="20dip"
+                android:background="#FBFBFB" />
+        </LinearLayout>
+
+        <View
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_weight="0.03"
+             >
+        </View>
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/selectedClientLayout"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dip"
+            android:layout_weight="0.4"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:background="#009ACD"
+                    android:text=" Client selectat "
+                    android:textColor="#E7FEFF"
+                    android:textSize="20sp"
+                    android:typeface="serif" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dip"
+                    android:background="#009ACD" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textSelectedClient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center"
+                android:layout_marginTop="25dip"
+                android:gravity="left"
+                android:textColor="@color/rowColor7"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar_event"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="15dip"
+                android:layout_marginTop="40dip"
+                android:max="50"
+                android:progressDrawable="@drawable/progress_bar_style_1" />
+
+            <Button
+                android:id="@+id/saveEventClienti"
+                style="@style/btnStyleEvent1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dip"
+                android:paddingLeft="40dip"
+                android:paddingRight="40dip" />
+
+            <Button
+                android:id="@+id/showArticoleLivrareBtn"
+                style="@style/btnStyleEvent2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="90dip"
+                android:paddingLeft="40dip"
+                android:paddingRight="40dip"
+                android:text="Articole" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <SlidingDrawer
+        android:id="@+id/articoleLivrareDrawer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateOnClick="false"
+        android:content="@+id/layout_art_livrare"
+        android:handle="@+id/slideBtnArtLivrare"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/slideBtnArtLivrare"
+            android:layout_width="fill_parent"
+            android:layout_height="45dip"
+            android:background="#EEC900" >
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center"
+                android:gravity="left|center"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textSelectedClientArt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dip"
+                    android:layout_marginLeft="20dip"
+                    android:layout_marginTop="10dip"
+                    android:textColor="#473C8B"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center"
+                android:gravity="right|center"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textSelectedDocArt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dip"
+                    android:layout_marginRight="20dip"
+                    android:layout_marginTop="10dip"
+                    android:text="INCHIDE"
+                    android:textColor="#473C8B"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/articole_livrare" />
+    </SlidingDrawer>
+
+</FrameLayout>

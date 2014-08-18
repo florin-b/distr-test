@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Distribu\u021Bie test</string>
+    
+    <string name="logon_name">Distribu\u021Bie test</string>
+    
+   
+    <string name="menu_settings">Settings</string>
+    <string name="strContentDescription">abc</string>
+
+    <color name="rowColor1">#4364A1</color>
+    <color name="rowColor2">#6495ED</color>
+    <color name="rowColor3">#698B69</color>
+    <color name="rowColor4">#547CC7</color>
+    
+    <color name="rowColor6">#CC7700</color>
+    <color name="rowColor7">#A64500</color>
+    <color name="rowColor8">#B2DFEE</color>
+    <color name="rowColor9">#F0F0F0</color>
+    <color name="rowColor10">#228B22</color>
+    <color name="rowColor11">#CD6600</color>    
+    <color name="rowColorAdresa">#2BB32B</color>
+    <color name="rowColorSosire">#698B69</color>
+   
+    <color name="black">#000000</color>
+    <color name="spinnerOptions1">#b8860b</color>
+    
+    <color name="backColorArtList">#E6E6E6</color>
+    <color name="backColorCmdList">#DEDEDE</color>
+
+</resources>

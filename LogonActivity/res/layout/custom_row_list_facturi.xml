@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FBFBFB"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/textNrCrt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="5dip"
+            android:layout_weight="0.03"
+            android:textColor="@color/rowColor2"
+            android:textSize="25sp"
+            android:textStyle="normal"
+            android:typeface="serif" />
+
+        <TextView
+            android:id="@+id/textNumeClient"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:layout_weight="0.4"
+            android:gravity="bottom|left"
+            android:textColor="@color/rowColor1"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+
+        <TextView
+            android:id="@+id/textCodClient"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_weight="0.0"
+            android:textSize="1sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip"
+            android:layout_weight="0.03" />
+
+        <TextView
+            android:id="@+id/textAdresaClient"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_weight="0.4"
+            android:textColor="@color/rowColorAdresa"
+            android:textSize="22sp"
+            android:typeface="serif" />
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.03" />
+
+        <TextView
+            android:id="@+id/textEv1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|bottom"
+            android:layout_weight="0.05"
+            android:gravity="left|bottom"
+            android:textColor="@color/rowColorSosire"
+            android:textSize="21sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/textTimpEv1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|bottom"
+            android:layout_weight="0.10"
+            android:gravity="left"
+            android:textColor="@color/rowColorSosire"
+            android:textSize="21sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/textEv2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|bottom"
+            android:layout_weight="0.05"
+            android:gravity="left"
+            android:textColor="@color/rowColorSosire"
+            android:textSize="21sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/textTimpEv2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|bottom"
+            android:layout_weight="0.10"
+            android:gravity="left"
+            android:textColor="@color/rowColorSosire"
+            android:textSize="21sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_weight="0.0"
+            android:textSize="1sp" />
+    </LinearLayout>
+
+</LinearLayout>
