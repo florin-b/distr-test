@@ -79,7 +79,6 @@ public class AsyncTaskWSCall {
 
 		@Override
 		protected void onPostExecute(String result) {
-			// TODO
 
 			try {
 

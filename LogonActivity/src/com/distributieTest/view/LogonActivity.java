@@ -11,9 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 import android.net.Uri;
@@ -25,11 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
-
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -39,14 +33,11 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
-
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.model.AsyncTaskWSCall;
 import com.distributieTest.model.InfoStrings;
 import com.distributieTest.model.UserInfo;
-
-
-
+import com.distributieTest.model.Utils;
 
 public class LogonActivity extends Activity implements AsyncTaskListener {
 
@@ -89,8 +80,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 			try {
 				pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 			} catch (Exception e) {
-				Toast.makeText(LogonActivity.this, e.toString(),
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(LogonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 			}
 
 			buildVer = String.valueOf(pInfo.versionCode);
@@ -136,13 +126,6 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 					}
 
-					// rotate right
-					if (arg > 0) {
-
-					} else {
-
-					}
-
 				}
 
 			});
@@ -154,7 +137,6 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	}
 
 	public void performLoginThread() {
-		// start login thread
 		try {
 
 			HashMap<String, String> params = new HashMap<String, String>();
@@ -166,39 +148,21 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 			params.put("userPass", passN);
 			params.put("ipAdr", "-1");
 
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, METHOD_NAME,
-					params);
+			AsyncTaskWSCall call = new AsyncTaskWSCall(this, METHOD_NAME, params);
 			call.getCallResults();
 
-
 		} catch (Exception e) {
-			Toast.makeText(getApplicationContext(), e.toString(),
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
 		}
 	}
-
 
 	public void validateLogin(String result) {
 		if (!result.equals("-1") && result.length() > 0) {
 			String[] token = result.split("#");
 
 			if (token[0].equals("0")) {
-
-				/*
-				 * LayoutInflater inflater = this.getLayoutInflater(); View view
-				 * = inflater.inflate(R.layout.cust_toast_layout, (ViewGroup)
-				 * findViewById(R.id.relativeLayout1));
-				 * 
-				 * Toast toast = new Toast(this); toast.setView(view);
-				 * toast.setDuration(Toast.LENGTH_LONG); toast.show();
-				 */
-
 				InfoStrings.showCustomToast(this, "Cont inexistent!");
 
-				/*
-				 * Toast.makeText(getApplicationContext(), "Cont inexistent!",
-				 * Toast.LENGTH_SHORT).show();
-				 */
 			}
 			if (token[0].equals("1")) {
 				InfoStrings.showCustomToast(this, "Cont blocat 60 de minute!");
@@ -217,9 +181,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 					String tempAgCod = token[4].toString();
 
 					if (tempAgCod.equalsIgnoreCase("-1")) {
-						Toast.makeText(getApplicationContext(),
-								"Utilizator nedefinit!", Toast.LENGTH_SHORT)
-								.show();
+						Toast.makeText(getApplicationContext(), "Utilizator nedefinit!", Toast.LENGTH_SHORT).show();
 						return;
 					}
 
@@ -233,10 +195,9 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 					uInfo.setNume(token[3]);
 					uInfo.setFiliala(token[2]);
 					uInfo.setCod(tempAgCod);
-					uInfo.setUnitLog(getFiliala(token[2].toString()));
+					uInfo.setUnitLog(Utils.getFiliala(token[2].toString()));
 
-					
-					//TEST!!
+					// TEST!!
 					uInfo.setCod("00120500");
 
 					try {
@@ -245,13 +206,11 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 						check.execute("dummy");
 
 					} catch (Exception e) {
-						Toast.makeText(LogonActivity.this, e.toString(),
-								Toast.LENGTH_LONG).show();
+						Toast.makeText(LogonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 					}
 
 				} else {
-					Toast.makeText(getApplicationContext(), "Acces interzis!",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "Acces interzis!", Toast.LENGTH_SHORT).show();
 
 				}
 			}
@@ -260,7 +219,6 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 			}
 		} else {
-
 			InfoStrings.showCustomToast(this, "Autentificare esuata!");
 
 		}
@@ -283,8 +241,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 			try {
 
-				mFTPClient.addProtocolCommandListener(new PrintCommandListener(
-						new PrintWriter(System.out)));
+				mFTPClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 
 				mFTPClient.connect("10.1.0.6", 21);
 
@@ -297,8 +254,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 					String sourceFile = "/Update/LiteSFA/DistributieVer.txt";
 
-					desFile2 = new FileOutputStream(
-							"sdcard/download/DistributieVer.txt");
+					desFile2 = new FileOutputStream("sdcard/download/DistributieVer.txt");
 					mFTPClient.retrieveFile(sourceFile, desFile2);
 
 				} else {
@@ -317,8 +273,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 						mFTPClient.disconnect();
 					} catch (IOException f) {
 						errMessage = f.getMessage();
-						Toast.makeText(LogonActivity.this, errMessage,
-								Toast.LENGTH_LONG).show();
+						Toast.makeText(LogonActivity.this, errMessage, Toast.LENGTH_LONG).show();
 					}
 
 				}
@@ -329,22 +284,17 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 		@Override
 		protected void onPostExecute(String result) {
-			// TODO
-
 			try {
-
 				stopSpinner();
 
 				if (!errMessage.equals("")) {
-					Toast toast = Toast.makeText(LogonActivity.this,
-							errMessage, Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(LogonActivity.this, errMessage, Toast.LENGTH_SHORT);
 					toast.show();
 				} else {
 					validateUpdate();
 				}
 			} catch (Exception e) {
-				Toast.makeText(LogonActivity.this, e.toString(),
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(LogonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 			}
 
 		}
@@ -358,8 +308,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 		try {
 
-			File fVer = new File(Environment.getExternalStorageDirectory()
-					+ "/download/DistributieVer.txt");
+			File fVer = new File(Environment.getExternalStorageDirectory() + "/download/DistributieVer.txt");
 			fileIS = new FileInputStream(fVer);
 			buf = new BufferedReader(new InputStreamReader(fileIS));
 			String readString = buf.readLine();
@@ -375,8 +324,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 						downloadUpdate download = new downloadUpdate(this);
 						download.execute("dummy");
 					} catch (Exception e) {
-						Toast.makeText(LogonActivity.this, e.toString(),
-								Toast.LENGTH_SHORT).show();
+						Toast.makeText(LogonActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
 					}
 
 				} else // nu exista update
@@ -388,8 +336,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 			}
 
 		} catch (Exception ex) {
-			Toast.makeText(LogonActivity.this, ex.getMessage(),
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(LogonActivity.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
 		} finally {
 
 			if (fileIS != null)
@@ -417,8 +364,7 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 			FileOutputStream desFile1 = null, desFile2 = null;
 			try {
 
-				mFTPClient.addProtocolCommandListener(new PrintCommandListener(
-						new PrintWriter(System.out)));
+				mFTPClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 
 				mFTPClient.connect("10.1.0.6", 21);
 
@@ -430,13 +376,11 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 					mFTPClient.enterLocalPassiveMode();
 
 					String sourceFile = "/Update/LiteSFA/Distributie.apk";
-					desFile1 = new FileOutputStream(
-							"sdcard/download/Distributie.apk");
+					desFile1 = new FileOutputStream("sdcard/download/Distributie.apk");
 					mFTPClient.retrieveFile(sourceFile, desFile1);
 
 					sourceFile = "/Update/LiteSFA/DistributieVer.txt";
-					desFile2 = new FileOutputStream(
-							"sdcard/download/DistributieVer.txt");
+					desFile2 = new FileOutputStream("sdcard/download/DistributieVer.txt");
 					mFTPClient.retrieveFile(sourceFile, desFile2);
 
 				} else {
@@ -457,7 +401,6 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 						mFTPClient.logout();
 						mFTPClient.disconnect();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
@@ -469,22 +412,18 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 		@Override
 		protected void onPostExecute(String result) {
-			// TODO
-
 			try {
 
 				stopSpinner();
 
 				if (!errMessage.equals("")) {
-					Toast toast = Toast.makeText(LogonActivity.this,
-							errMessage, Toast.LENGTH_SHORT);
+					Toast toast = Toast.makeText(LogonActivity.this, errMessage, Toast.LENGTH_SHORT);
 					toast.show();
 				} else {
 					startInstall();
 				}
 			} catch (Exception e) {
-				Toast.makeText(getApplicationContext(), e.toString(),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -493,25 +432,21 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	public void startInstall() {
 
 		String fileUrl = "/download/Distributie.apk";
-		String file = android.os.Environment.getExternalStorageDirectory()
-				.getPath() + fileUrl;
+		String file = android.os.Environment.getExternalStorageDirectory().getPath() + fileUrl;
 		File f = new File(file);
 
 		if (f.exists()) {
 
 			// start install
 			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(new File(Environment
-					.getExternalStorageDirectory()
-					+ "/download/"
-					+ "Distributie.apk")),
-					"application/vnd.android.package-archive");
+			intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/download/"
+					+ "Distributie.apk")), "application/vnd.android.package-archive");
 			startActivity(intent);
 
 			finish();
 		} else {
-			Toast toast = Toast.makeText(LogonActivity.this,
-					"Fisier corupt, repetati operatiunea!", Toast.LENGTH_SHORT);
+			Toast toast = Toast
+					.makeText(LogonActivity.this, "Fisier corupt, repetati operatiunea!", Toast.LENGTH_SHORT);
 			toast.show();
 
 		}
@@ -521,26 +456,21 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	private void redirectView() {
 
 		if (!InfoStrings.getCurentClient(getApplicationContext()).equals("0")) {
-			Intent nextScreen = new Intent(getApplicationContext(),
-					Livrare.class);
+			Intent nextScreen = new Intent(getApplicationContext(), Livrare.class);
 			startActivity(nextScreen);
 			finish();
 		}
 
 		if (!InfoStrings.getNrBorderou(getApplicationContext()).equals("0")
-				&& InfoStrings.getCurentClient(getApplicationContext()).equals(
-						"0")) {
-			Intent nextScreen = new Intent(getApplicationContext(),
-					Evenimente.class);
+				&& InfoStrings.getCurentClient(getApplicationContext()).equals("0")) {
+			Intent nextScreen = new Intent(getApplicationContext(), Evenimente.class);
 			startActivity(nextScreen);
 			finish();
 		}
 
 		if (InfoStrings.getNrBorderou(getApplicationContext()).equals("0")
-				&& InfoStrings.getCurentClient(getApplicationContext()).equals(
-						"0")) {
-			Intent nextScreen = new Intent(getApplicationContext(),
-					MainMenu.class);
+				&& InfoStrings.getCurentClient(getApplicationContext()).equals("0")) {
+			Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 			startActivity(nextScreen);
 			finish();
 		}
@@ -556,70 +486,6 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	private void stopSpinner() {
 		pw.setVisibility(View.INVISIBLE);
 		pw.stopSpinning();
-	}
-
-	public String getFiliala(String numeFiliala) {
-		String fl = "NN10";
-
-		if (numeFiliala.equals("BACAU"))
-			fl = "BC10";
-
-		if (numeFiliala.equals("GALATI"))
-			fl = "GL10";
-
-		if (numeFiliala.equals("PITESTI"))
-			fl = "AG10";
-
-		if (numeFiliala.equals("TIMISOARA"))
-			fl = "TM10";
-
-		if (numeFiliala.equals("ORADEA"))
-			fl = "BH10";
-
-		if (numeFiliala.equals("FOCSANI"))
-			fl = "VN10";
-
-		if (numeFiliala.equals("GLINA"))
-			fl = "BU10";
-
-		if (numeFiliala.equals("ANDRONACHE"))
-			fl = "BU13";
-
-		if (numeFiliala.equals("OTOPENI"))
-			fl = "BU12";
-
-		if (numeFiliala.equals("CLUJ"))
-			fl = "CJ10";
-
-		if (numeFiliala.equals("BAIA"))
-			fl = "MM10";
-
-		if (numeFiliala.equals("MILITARI"))
-			fl = "BU11";
-
-		if (numeFiliala.equals("CONSTANTA"))
-			fl = "CT10";
-
-		if (numeFiliala.equals("BRASOV"))
-			fl = "BV10";
-
-		if (numeFiliala.equals("PLOIESTI"))
-			fl = "PH10";
-
-		if (numeFiliala.equals("PIATRA"))
-			fl = "NT10";
-
-		if (numeFiliala.equals("MURES"))
-			fl = "MS10";
-
-		if (numeFiliala.equals("IASI"))
-			fl = "IS10";
-
-		if (numeFiliala.equals("CRAIOVA"))
-			fl = "DJ10";
-
-		return fl;
-
 	}
 
 	@Override

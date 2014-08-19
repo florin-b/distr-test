@@ -4,17 +4,14 @@
  */
 package com.distributieTest.view;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.model.AsyncTaskWSCall;
 import com.distributieTest.model.InfoStrings;
-
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -101,11 +98,6 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 		pw.setVisibility(View.VISIBLE);
 		pw.spin();
 
-	}
-
-	private void stopSpinner() {
-		pw.setVisibility(View.INVISIBLE);
-		pw.stopSpinning();
 	}
 
 	private void getFmsData() {

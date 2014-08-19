@@ -12,7 +12,7 @@
 			<accessrule kind="nonaccessible" pattern="com/android/internal/**"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="D:/Aplicatii/Android/Distributie marfuri - TEST/Distributie/commons-net-3.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="D:/Aplicatii/Android/Distributie marfuri - TEST/Distributie/ksoap2-android-assembly-2.6.0-jar-with-dependencies.jar"/>
+	<classpathentry exported="true" kind="lib" path="commons-net-3.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="ksoap2-android-assembly-2.6.0-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

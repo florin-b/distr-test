@@ -9,17 +9,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
-
-import com.distributieTest.listeners.AsyncTaskListener;
-import com.distributieTest.listeners.CustomSpinnerListener;
-import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanBorderou;
-import com.distributieTest.model.HandleJSONData;
-import com.distributieTest.model.InfoStrings;
-import com.distributieTest.model.UserInfo;
-
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -38,6 +27,16 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.distributieTest.listeners.AsyncTaskListener;
+import com.distributieTest.listeners.CustomSpinnerListener;
+import com.distributieTest.model.AsyncTaskWSCall;
+import com.distributieTest.model.BeanBorderou;
+import com.distributieTest.model.BeanEveniment;
+import com.distributieTest.model.HandleJSONData;
+import com.distributieTest.model.InfoStrings;
+import com.distributieTest.model.UserInfo;
+import com.distributieTest.model.Utils;
 
 public class Evenimente extends Activity implements AsyncTaskListener, CustomSpinnerListener {
 
@@ -392,7 +391,10 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 		try {
 
-			if (!eventsData.equals("-1") && !eventsData.equals("0")) {
+			HandleJSONData objListEvenimente = new HandleJSONData(this, eventsData);
+			ArrayList<BeanEveniment> evenimenteArray = objListEvenimente.decodeJSONEveniment();
+
+			if (evenimenteArray.size() > 0) {
 
 				layoutEventOut.setVisibility(View.INVISIBLE);
 				layoutEventIn.setVisibility(View.INVISIBLE);
@@ -400,22 +402,16 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 				layoutDetButton.setVisibility(View.GONE);
 				layoutTotalTrip.setVisibility(View.GONE);
 
-				String[] tokenLinie = eventsData.split("@@");
-				String[] tokenEvent;
-				String client = "";
+				for (int i = 0; i < evenimenteArray.size(); i++) {
 
-				for (int i = 0; i < tokenLinie.length; i++) {
+					if (evenimenteArray.get(i).getEveniment().equals("P")) {
 
-					client = tokenLinie[i];
-					tokenEvent = client.split("#");
+						textDateEventOut.setText(evenimenteArray.get(i).getData());
 
-					if (tokenEvent[0].equals("P")) {
-
-						textDateEventOut.setText(tokenEvent[1]);
-
-						textTimeEventOut.setText(tokenEvent[2].substring(0, 2) + ":" + tokenEvent[2].substring(2, 4)
-								+ ":" + tokenEvent[2].substring(4, 6));
-						textKmEventOut.setText(tokenEvent[3]);
+						textTimeEventOut.setText(evenimenteArray.get(i).getOra().substring(0, 2) + ":"
+								+ evenimenteArray.get(i).getOra().substring(2, 4) + ":"
+								+ evenimenteArray.get(i).getOra().substring(4, 6));
+						textKmEventOut.setText(evenimenteArray.get(i).getDistantaKM());
 						layoutEventOut.setVisibility(View.VISIBLE);
 
 						eventButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.in1, 0, 0, 0);
@@ -425,12 +421,13 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 						layoutDetButton.setVisibility(View.VISIBLE);
 
 					}
-					if (tokenEvent[0].equals("S")) {
+					if (evenimenteArray.get(i).getEveniment().equals("S")) {
 
-						textDateEventIn.setText(tokenEvent[1]);
-						textTimeEventIn.setText(tokenEvent[2].substring(0, 2) + ":" + tokenEvent[2].substring(2, 4)
-								+ ":" + tokenEvent[2].substring(4, 6));
-						textKmEventIn.setText(tokenEvent[3]);
+						textDateEventIn.setText(evenimenteArray.get(i).getData());
+						textTimeEventIn.setText(evenimenteArray.get(i).getOra().substring(0, 2) + ":"
+								+ evenimenteArray.get(i).getOra().substring(2, 4) + ":"
+								+ evenimenteArray.get(i).getOra().substring(4, 6));
+						textKmEventIn.setText(evenimenteArray.get(i).getDistantaKM());
 
 						eventButton.setVisibility(View.INVISIBLE);
 						layoutDetButton.setVisibility(View.GONE);
@@ -443,7 +440,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 						Calendar cal1 = Calendar.getInstance();
 						cal1.set(Calendar.YEAR, Integer.valueOf("20" + strDataStart[2]));
-						cal1.set(Calendar.MONTH, getMonthNumber(strDataStart[1]));
+						cal1.set(Calendar.MONTH, Utils.getMonthNumber(strDataStart[1]));
 						cal1.set(Calendar.DAY_OF_MONTH, Integer.valueOf(strDataStart[0]));
 						cal1.set(Calendar.HOUR, Integer.valueOf(strOraStart[0]));
 						cal1.set(Calendar.MINUTE, Integer.valueOf(strOraStart[1]));
@@ -453,14 +450,14 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 						Calendar cal2 = Calendar.getInstance();
 						cal2.set(Calendar.YEAR, Integer.valueOf("20" + strDataStop[2]));
-						cal2.set(Calendar.MONTH, getMonthNumber(strDataStop[1]));
+						cal2.set(Calendar.MONTH, Utils.getMonthNumber(strDataStop[1]));
 						cal2.set(Calendar.DAY_OF_MONTH, Integer.valueOf(strDataStop[0]));
 						cal2.set(Calendar.HOUR, Integer.valueOf(strOraStop[0]));
 						cal2.set(Calendar.MINUTE, Integer.valueOf(strOraStop[1]));
 
 						long milisecs = cal2.getTimeInMillis() - cal1.getTimeInMillis();
 						String strTotalTime = "";
-						strTotalTime = getDuration(milisecs);
+						strTotalTime = Utils.getDuration(milisecs);
 
 						textTripTime.setText(strTotalTime);
 
@@ -496,90 +493,6 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 		} catch (Exception ex) {
 			Toast.makeText(Evenimente.this, ex.toString(), Toast.LENGTH_LONG).show();
 		}
-
-	}
-
-	public static String getDuration(long millis) {
-
-		StringBuilder sb = new StringBuilder(64);
-
-		if (millis > 0) {
-
-			long days = TimeUnit.MILLISECONDS.toDays(millis);
-			millis -= TimeUnit.DAYS.toMillis(days);
-			long hours = TimeUnit.MILLISECONDS.toHours(millis);
-			millis -= TimeUnit.HOURS.toMillis(hours);
-			long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-			millis -= TimeUnit.MINUTES.toMillis(minutes);
-
-			if (days > 0) {
-				sb.append(days);
-				sb.append(" Zile ");
-			}
-			if (hours > 0) {
-				sb.append(hours);
-				sb.append(" Ore ");
-			}
-			if (minutes > 0) {
-				sb.append(minutes);
-				sb.append(" Minute ");
-			}
-		}
-		return (sb.toString());
-	}
-
-	private int getMonthNumber(String monthName) {
-		int monthNumber = 0;
-
-		if (monthName.equals("JAN")) {
-			monthNumber = 1;
-		}
-
-		if (monthName.equals("FEB")) {
-			monthNumber = 2;
-		}
-
-		if (monthName.equals("MAR")) {
-			monthNumber = 3;
-		}
-
-		if (monthName.equals("APR")) {
-			monthNumber = 4;
-		}
-
-		if (monthName.equals("MAY")) {
-			monthNumber = 5;
-		}
-
-		if (monthName.equals("JUN")) {
-			monthNumber = 6;
-		}
-
-		if (monthName.equals("JUL")) {
-			monthNumber = 7;
-		}
-
-		if (monthName.equals("AUG")) {
-			monthNumber = 8;
-		}
-
-		if (monthName.equals("SEP")) {
-			monthNumber = 9;
-		}
-
-		if (monthName.equals("OCT")) {
-			monthNumber = 10;
-		}
-
-		if (monthName.equals("NOV")) {
-			monthNumber = 11;
-		}
-
-		if (monthName.equals("DEC")) {
-			monthNumber = 12;
-		}
-
-		return monthNumber;
 
 	}
 

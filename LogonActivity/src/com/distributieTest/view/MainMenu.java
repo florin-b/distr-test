@@ -4,10 +4,6 @@
  */
 package com.distributieTest.view;
 
-
-
-
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -23,15 +19,14 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
-
 public class MainMenu extends Activity {
 
 	GridView mainGridView;
 
 	private String[] btnNames = { "Sofer", "Borderouri", "Livrare", "Istoric", "Test", "Iesire" };
 
-	private int[] btnIcons = new int[] { R.drawable.chauffeur_hat, R.drawable.documents_icon, R.drawable.delivery, R.drawable.history,R.drawable.test_connection,
-			R.drawable.exit };
+	private int[] btnIcons = new int[] { R.drawable.chauffeur_hat, R.drawable.documents_icon, R.drawable.delivery,
+			R.drawable.history, R.drawable.test_connection, R.drawable.exit };
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -161,8 +156,7 @@ public class MainMenu extends Activity {
 					}
 
 				}
-				
-				
+
 				// test
 				if (selectedBtnName.equalsIgnoreCase("Test")) {
 
@@ -177,7 +171,7 @@ public class MainMenu extends Activity {
 						Toast.makeText(MainMenu.this, e.toString(), Toast.LENGTH_SHORT).show();
 					}
 
-				}				
+				}
 
 				// istoric
 				if (selectedBtnName.equalsIgnoreCase("Istoric")) {

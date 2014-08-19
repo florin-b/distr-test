@@ -20,7 +20,7 @@ import android.app.Activity;
 
 public class BorderouriAdapter extends SimpleAdapter {
 
-	private int[] colors = new int[] { 0x30D1BC71, 0x30F6F2E4 };
+	
 
 	private int[] colorTipBorderou = { 0x30B2DFEE, 0x3090EE90, 0x30FFFFE0,
 			0x30FAFAD2, 0x30C5C1AA };

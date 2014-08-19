@@ -68,7 +68,7 @@ public class HandleJSONData {
 				JSONObject facturaObject = jsonObject.getJSONObject(i);
 
 				oFactura = new BeanFacturiBorderou();
-				
+
 				oFactura.setCodFurnizor(facturaObject.getString("codFurnizor"));
 				oFactura.setNumeFurnizor(facturaObject.getString("numeFurnizor"));
 				oFactura.setAdresaFurnizor(facturaObject.getString("adresaFurnizor"));
@@ -90,6 +90,67 @@ public class HandleJSONData {
 		}
 
 		return objectsList;
+	}
+
+	public ArrayList<BeanEvenimentBorderou> decodeJSONEvenimentBorderou() {
+		BeanEvenimentBorderou eveniment = null;
+		ArrayList<BeanEvenimentBorderou> objectList = new ArrayList<BeanEvenimentBorderou>();
+
+		try {
+			jsonObject = new JSONArray(JSONString);
+
+			for (int i = 0; i < jsonObject.length(); i++) {
+				JSONObject evenimentObject = jsonObject.getJSONObject(i);
+
+				eveniment = new BeanEvenimentBorderou();
+
+				eveniment.setNumeClient(evenimentObject.getString("numeClient"));
+				eveniment.setCodClient(evenimentObject.getString("codClient"));
+				eveniment.setOraStartCursa(evenimentObject.getString("oraStartCursa"));
+				eveniment.setKmStartCursa(evenimentObject.getString("kmStartCursa"));
+				eveniment.setOraSosireClient(evenimentObject.getString("oraSosireClient"));
+				eveniment.setKmSosireClient(evenimentObject.getString("kmSosireClient"));
+				eveniment.setOraPlecare(evenimentObject.getString("oraPlecare"));
+
+				objectList.add(eveniment);
+
+			}
+
+		} catch (JSONException e) {
+			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+		}
+
+		return objectList;
+
+	}
+
+	public ArrayList<BeanEveniment> decodeJSONEveniment() {
+		BeanEveniment eveniment = null;
+		ArrayList<BeanEveniment> objectList = new ArrayList<BeanEveniment>();
+
+		try {
+			jsonObject = new JSONArray(JSONString);
+
+			for (int i = 0; i < jsonObject.length(); i++) {
+				JSONObject evenimentObject = jsonObject.getJSONObject(i);
+
+				eveniment = new BeanEveniment();
+
+				eveniment.setEveniment(evenimentObject.getString("eveniment"));
+				eveniment.setData(evenimentObject.getString("data"));
+				eveniment.setOra(evenimentObject.getString("ora"));
+				eveniment.setDistantaKM(evenimentObject.getString("distantaKM"));
+
+				objectList.add(eveniment);
+
+			}
+
+		} catch (JSONException e) {
+			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+		}
+
+		return objectList;
+
 	}
 
 }

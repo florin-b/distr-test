@@ -7,35 +7,29 @@ package com.distributieTest.view;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanBorderou;
 import com.distributieTest.model.BeanFacturiBorderou;
 import com.distributieTest.model.HandleJSONData;
 import com.distributieTest.model.InfoStrings;
 import com.distributieTest.model.UserInfo;
-
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -246,9 +240,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 					.equals("distributie")) {
 
 				adapterFacturi = new CustomAdapter(this, arrayListFacturi, R.layout.custom_row_list_facturi,
-						new String[] { "nrCrt", "numeClient", "codClient", "adresaClient", "ev1", "timpEv1", "ev2", "timpEv2" },
-						new int[] { R.id.textNrCrt, R.id.textNumeClient,R.id.textAdresaClient, R.id.textCodClient, R.id.textEv1,
-								R.id.textTimpEv1, R.id.textEv2, R.id.textTimpEv2 });
+						new String[] { "nrCrt", "numeClient", "codClient", "adresaClient", "ev1", "timpEv1", "ev2",
+								"timpEv2" }, new int[] { R.id.textNrCrt, R.id.textNumeClient, R.id.textAdresaClient,
+								R.id.textCodClient, R.id.textEv1, R.id.textTimpEv1, R.id.textEv2, R.id.textTimpEv2 });
 				listFacturi.setAdapter(adapterFacturi);
 
 				for (int i = 0; i < facturiArray.size(); i++) {

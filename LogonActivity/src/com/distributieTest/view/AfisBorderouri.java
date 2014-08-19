@@ -5,32 +5,17 @@
 package com.distributieTest.view;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-
-
-
-import java.util.concurrent.TimeUnit;
-
-import com.distributieTest.listeners.AsyncTaskListener;
-import com.distributieTest.listeners.CustomSpinnerListener;
-import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.UserInfo;
-import com.distributieTest.view.R;
-
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -38,6 +23,15 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.distributieTest.listeners.AsyncTaskListener;
+import com.distributieTest.listeners.CustomSpinnerListener;
+import com.distributieTest.model.AsyncTaskWSCall;
+import com.distributieTest.model.BeanBorderou;
+import com.distributieTest.model.BeanEvenimentBorderou;
+import com.distributieTest.model.HandleJSONData;
+import com.distributieTest.model.UserInfo;
+import com.distributieTest.model.Utils;
 
 public class AfisBorderouri extends Activity implements AsyncTaskListener, CustomSpinnerListener {
 
@@ -236,28 +230,25 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 	private void populateListBorderouri(String borderouri) {
 
-		if (borderouri.contains("@@")) {
+		HandleJSONData objListBorderouri = new HandleJSONData(this, borderouri);
+		ArrayList<BeanBorderou> borderouriArray = objListBorderouri.decodeJSONBorderouri();
+
+		if (borderouriArray.size() > 0) {
 
 			spinnerBorderouri.setVisibility(View.VISIBLE);
-
 			listBorderouri.clear();
 			spinnerBorderouri.setEnabled(true);
 
 			HashMap<String, String> temp;
-			String[] tokenLinie = borderouri.split("@@");
-			String[] tokenBorderou;
-			String client = "";
 
-			for (int i = 0; i < tokenLinie.length; i++) {
+			for (int i = 0; i < borderouriArray.size(); i++) {
 				temp = new HashMap<String, String>();
-				client = tokenLinie[i];
-				tokenBorderou = client.split("#");
 
 				temp.put("nrCrt", String.valueOf(i + 1) + ".");
-				temp.put("codBorderou", tokenBorderou[0]);
-				temp.put("dataBorderou", tokenBorderou[1]);
+				temp.put("codBorderou", borderouriArray.get(i).getNumarBorderou());
+				temp.put("dataBorderou", borderouriArray.get(i).getDataEmiterii());
 				temp.put("nrPozitii", " ");
-				temp.put("eveniment", tokenBorderou[2]);
+				temp.put("eveniment", borderouriArray.get(i).getEvenimentBorderou());
 
 				listBorderouri.add(temp);
 			}
@@ -282,7 +273,6 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 			startSpinner();
 
 			HashMap<String, String> params = new HashMap<String, String>();
-
 			params.put("nrBorderou", selectedBorderou);
 			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getEvenimenteBorderou", params);
 			call.getCallResults();
@@ -299,49 +289,57 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 		try {
 
+			HandleJSONData objListEvenimente = new HandleJSONData(this, eventsData);
+			ArrayList<BeanEvenimentBorderou> evenimenteArray = objListEvenimente.decodeJSONEvenimentBorderou();
+
 			listEvenimente.clear();
 			textStartBorderou.setVisibility(View.GONE);
 
-			if (eventsData.contains("@@")) {
+			if (evenimenteArray.size() > 0) {
 
 				HashMap<String, String> temp;
-				String[] tokenLinie = eventsData.split("@@");
-				String[] tokenEveniment, tokenStartClient, varTokStartBord;
-				String eveniment = "", strStartBorderou = "";
+
+				String[] tokenStartClient, varTokStartBord;
+				String strStartBorderou = "";
 				double tripDistance = 0;
 
-				for (int i = 0; i < tokenLinie.length; i++) {
+				for (int i = 0; i < evenimenteArray.size(); i++) {
+
 					temp = new HashMap<String, String>();
-					eveniment = tokenLinie[i];
-					tokenEveniment = eveniment.split("#");
 
 					temp.put("nrCrt", String.valueOf(i + 1) + ".");
-					temp.put("numeClient", tokenEveniment[0]);
-					temp.put("codClient", tokenEveniment[1]);
+					temp.put("numeClient", evenimenteArray.get(i).getNumeClient());
+					temp.put("codClient", evenimenteArray.get(i).getCodClient());
 
 					temp.put("ev1", "Sosire:");
 					temp.put("ev2", "Plecare:");
 
-					if (!tokenEveniment[2].equals("0")) {
-						varTokStartBord = tokenEveniment[2].split(":");
+					if (!evenimenteArray.get(i).getOraStartCursa().equals("0")) {
+						varTokStartBord = evenimenteArray.get(i).getOraStartCursa().split(":");
 						strStartBorderou = varTokStartBord[0].substring(6, 8) + "-"
 								+ varTokStartBord[0].substring(4, 6) + "-" + varTokStartBord[0].substring(0, 4) + " "
 								+ varTokStartBord[1].substring(0, 2) + ":" + varTokStartBord[1].substring(2, 4);
 					}
 
-					if (!tokenEveniment[4].equals("0")) {
-						tokenStartClient = tokenEveniment[4].split(":");
-						tripDistance = Double.valueOf(tokenEveniment[5]) - Double.valueOf(tokenEveniment[3]);
+					if (!evenimenteArray.get(i).getOraSosireClient().equals("0")) {
+						tokenStartClient = evenimenteArray.get(i).getOraSosireClient().split(":");
+						tripDistance = Double.valueOf(evenimenteArray.get(i).getKmSosireClient())
+								- Double.valueOf(evenimenteArray.get(i).getKmStartCursa());
 
 						temp.put(
 								"timpEv1",
-								tokenStartClient[1].substring(0, 2) + ":" + tokenStartClient[1].substring(2, 4) + " , "
-										+ getDuration2(tokenEveniment[2], tokenEveniment[4]) + " , "
+								tokenStartClient[1].substring(0, 2)
+										+ ":"
+										+ tokenStartClient[1].substring(2, 4)
+										+ " , "
+										+ Utils.getDuration2(evenimenteArray.get(i).getOraStartCursa(), evenimenteArray
+												.get(i).getOraSosireClient()) + " , "
 										+ String.format("%.2f", tripDistance) + " km");
 					}
 
-					if (!tokenEveniment[6].equals("0")) {
-						temp.put("timpEv2", tokenEveniment[6].substring(0, 2) + ":" + tokenEveniment[6].substring(2, 4));
+					if (!evenimenteArray.get(i).getOraPlecare().equals("0")) {
+						temp.put("timpEv2", evenimenteArray.get(i).getOraPlecare().substring(0, 2) + ":"
+								+ evenimenteArray.get(i).getOraPlecare().substring(2, 4));
 					}
 
 					listEvenimente.add(temp);
@@ -357,120 +355,9 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 			}
 
 		} catch (Exception ex) {
-			Toast.makeText(AfisBorderouri.this, "erorare " + ex.toString(), Toast.LENGTH_LONG).show();
+			Toast.makeText(AfisBorderouri.this, "eroare " + ex.toString(), Toast.LENGTH_LONG).show();
 		}
 
-	}
-
-	private static String getDuration2(String dataStart, String dataStop) {
-		String strDuration = "";
-
-		String[] tokenStart = dataStart.split(":");
-		String[] tokenStop = dataStop.split(":");
-
-		Calendar cal1 = Calendar.getInstance();
-		cal1.set(Calendar.YEAR, Integer.valueOf(tokenStart[0].substring(0, 4)));
-		cal1.set(Calendar.MONTH, getMonthNumber(tokenStart[0].substring(4, 6)));
-		cal1.set(Calendar.DAY_OF_MONTH, Integer.valueOf(tokenStart[0].substring(6, 8)));
-		cal1.set(Calendar.HOUR, Integer.valueOf(tokenStart[1].substring(0, 2)));
-		cal1.set(Calendar.MINUTE, Integer.valueOf(tokenStart[1].substring(2, 4)));
-
-		Calendar cal2 = Calendar.getInstance();
-		cal2.set(Calendar.YEAR, Integer.valueOf(tokenStop[0].substring(0, 4)));
-		cal2.set(Calendar.MONTH, getMonthNumber(tokenStop[0].substring(4, 6)));
-		cal2.set(Calendar.DAY_OF_MONTH, Integer.valueOf(tokenStop[0].substring(6, 8)));
-		cal2.set(Calendar.HOUR, Integer.valueOf(tokenStop[1].substring(0, 2)));
-		cal2.set(Calendar.MINUTE, Integer.valueOf(tokenStop[1].substring(2, 4)));
-
-		long milisecs = cal2.getTimeInMillis() - cal1.getTimeInMillis();
-
-		strDuration = getDuration(milisecs);
-
-		return strDuration;
-	}
-
-	private static int getMonthNumber(String monthName) {
-		int monthNumber = 0;
-
-		if (monthName.equals("JAN")) {
-			monthNumber = 1;
-		}
-
-		if (monthName.equals("FEB")) {
-			monthNumber = 2;
-		}
-
-		if (monthName.equals("MAR")) {
-			monthNumber = 3;
-		}
-
-		if (monthName.equals("APR")) {
-			monthNumber = 4;
-		}
-
-		if (monthName.equals("MAY")) {
-			monthNumber = 5;
-		}
-
-		if (monthName.equals("JUN")) {
-			monthNumber = 6;
-		}
-
-		if (monthName.equals("JUL")) {
-			monthNumber = 7;
-		}
-
-		if (monthName.equals("AUG")) {
-			monthNumber = 8;
-		}
-
-		if (monthName.equals("SEP")) {
-			monthNumber = 9;
-		}
-
-		if (monthName.equals("OCT")) {
-			monthNumber = 10;
-		}
-
-		if (monthName.equals("NOV")) {
-			monthNumber = 11;
-		}
-
-		if (monthName.equals("DEC")) {
-			monthNumber = 12;
-		}
-
-		return monthNumber;
-
-	}
-
-	public static String getDuration(long millis) {
-
-		StringBuilder sb = new StringBuilder(64);
-
-		if (millis > 0) {
-
-			long days = TimeUnit.MILLISECONDS.toDays(millis);
-			millis -= TimeUnit.DAYS.toMillis(days);
-			long hours = TimeUnit.MILLISECONDS.toHours(millis);
-			millis -= TimeUnit.HOURS.toMillis(hours);
-			long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-			millis -= TimeUnit.MINUTES.toMillis(minutes);
-
-			if (days > 0) {
-				sb.append(days);
-				sb.append(" Zile ");
-			}
-			if (hours > 0) {
-				sb.append(hours);
-				sb.append(" Ore ");
-			}
-			if (minutes > 0) {
-				sb.append(minutes);
-				sb.append(" Minute ");
-			}
-		}
-		return (sb.toString());
 	}
 
 	@Override

@@ -7,8 +7,6 @@ package com.distributieTest.view;
 import java.util.HashMap;
 import java.util.List;
 
-
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-//zebra
 public class CustomAdapter extends SimpleAdapter {
 
 	Context context;
@@ -25,8 +22,8 @@ public class CustomAdapter extends SimpleAdapter {
 	private int[] colorEvents = new int[] { 0x307FFFD4, 0x30FFD700, 0x30EE9572 };
 
 	static class ViewHolder {
-		public TextView textNrCrt, textNumeClient, textCodClient, textAdresaClient, textEv1,
-				textTimpEv1, textEv2, textTimpEv2;
+		public TextView textNrCrt, textNumeClient, textCodClient,
+				textAdresaClient, textEv1, textTimpEv1, textEv2, textTimpEv2;
 	}
 
 	public CustomAdapter(Context context, List<HashMap<String, String>> items,
@@ -50,10 +47,10 @@ public class CustomAdapter extends SimpleAdapter {
 			viewHolder.textNrCrt = (TextView) view.findViewById(R.id.textNrCrt);
 			viewHolder.textNumeClient = (TextView) view
 					.findViewById(R.id.textNumeClient);
-			
+
 			viewHolder.textAdresaClient = (TextView) view
 					.findViewById(R.id.textAdresaClient);
-			
+
 			viewHolder.textCodClient = (TextView) view
 					.findViewById(R.id.textCodClient);
 			viewHolder.textEv1 = (TextView) view.findViewById(R.id.textEv1);
@@ -82,9 +79,9 @@ public class CustomAdapter extends SimpleAdapter {
 
 		tokNewVal = artMap.get("codClient");
 		holder.textCodClient.setText(tokNewVal);
-		
+
 		tokNewVal = artMap.get("adresaClient");
-		holder.textAdresaClient.setText(tokNewVal);		
+		holder.textAdresaClient.setText(tokNewVal);
 
 		tokNewVal = artMap.get("ev1");
 		holder.textEv1.setText(tokNewVal);

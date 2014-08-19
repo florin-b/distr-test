@@ -6,7 +6,6 @@ package com.distributieTest.view;
 
 import com.distributieTest.model.UserInfo;
 
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
