@@ -33,6 +33,7 @@ import com.distributieTest.listeners.CustomSpinnerListener;
 import com.distributieTest.model.AsyncTaskWSCall;
 import com.distributieTest.model.BeanBorderou;
 import com.distributieTest.model.BeanEveniment;
+import com.distributieTest.model.EncodeJSONData;
 import com.distributieTest.model.HandleJSONData;
 import com.distributieTest.model.InfoStrings;
 import com.distributieTest.model.UserInfo;
@@ -253,15 +254,21 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 			startSpinner();
 
-			HashMap<String, String> params = new HashMap<String, String>();
-
 			String localStrDocNr = InfoStrings.getNrBorderou(Evenimente.this);
 
-			params.put("codSofer", UserInfo.getInstance().getCod());
-			params.put("document", localStrDocNr);
-			params.put("client", localStrDocNr);
-			params.put("eveniment", InfoStrings.getEveniment(Evenimente.this));
-			params.put("truckData", getTruckServiceData());
+			HashMap<String, String> newEventData = new HashMap<String, String>();
+			newEventData.put("codSofer", UserInfo.getInstance().getCod());
+			newEventData.put("document", localStrDocNr);
+			newEventData.put("client", localStrDocNr);
+			newEventData.put("codAdresa", " ");
+			newEventData.put("eveniment", InfoStrings.getEveniment(Evenimente.this));
+			newEventData.put("truckData", getTruckServiceData());
+
+			EncodeJSONData jsonEvLivrare = new EncodeJSONData(this, newEventData);
+			String serializedData = jsonEvLivrare.encodeNewEventData();
+
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("serializedEvent", serializedData);
 
 			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "saveNewEvent", params);
 			call.getCallResults();

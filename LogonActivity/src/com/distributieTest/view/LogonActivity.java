@@ -188,17 +188,16 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 					StringBuffer sb = new StringBuffer();
 
 					for (int i = 0; i < 8 - token[4].length(); i++) {
-						sb.append('0').append(tempAgCod);
+						sb.append('0');
 					}
+
+					sb.append(token[4]);
 
 					tempAgCod = sb.toString();
 					uInfo.setNume(token[3]);
 					uInfo.setFiliala(token[2]);
 					uInfo.setCod(tempAgCod);
 					uInfo.setUnitLog(Utils.getFiliala(token[2].toString()));
-
-					// TEST!!
-					uInfo.setCod("00120500");
 
 					try {
 						startSpinner();

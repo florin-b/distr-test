@@ -13,7 +13,6 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import com.distributieTest.listeners.AsyncTaskListener;
 
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -61,6 +60,7 @@ public class AsyncTaskWSCall {
 				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
 				envelope.dotNet = true;
 				envelope.setOutputSoapObject(request);
+
 				HttpTransportSE androidHttpTransport = new HttpTransportSE(ConnectionStrings.getInstance().getUrl(),
 						60000);
 

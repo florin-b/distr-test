@@ -108,6 +108,18 @@
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:typeface="monospace" />
+            
+			<TextView
+			    android:id="@+id/textAdresaClient"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_gravity="left|center"
+			    android:layout_marginTop="10dip"
+			    android:gravity="left"
+			    android:textColor="@color/rowColor6"
+			    android:textSize="24sp"
+			    android:textStyle="normal"
+			    android:typeface="monospace" />
 
             <ProgressBar
                 android:id="@+id/progress_bar_event"

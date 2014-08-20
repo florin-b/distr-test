@@ -7,6 +7,7 @@ public class BeanFacturiBorderou {
 	private String adresaClient;
 	private String sosireClient;
 	private String plecareClient;
+	private String codAdresaClient;
 
 	private String codFurnizor;
 	private String numeFurnizor;
@@ -95,6 +96,14 @@ public class BeanFacturiBorderou {
 
 	public void setPlecareFurnizor(String plecareFurnizor) {
 		this.plecareFurnizor = plecareFurnizor;
+	}
+
+	public String getCodAdresaClient() {
+		return codAdresaClient;
+	}
+
+	public void setCodAdresaClient(String codAdresaClient) {
+		this.codAdresaClient = codAdresaClient;
 	}
 
 	

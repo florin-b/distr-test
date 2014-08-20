@@ -80,6 +80,7 @@ public class HandleJSONData {
 				oFactura.setAdresaClient(facturaObject.getString("adresaClient"));
 				oFactura.setSosireClient(facturaObject.getString("sosireClient"));
 				oFactura.setPlecareClient(facturaObject.getString("plecareClient"));
+				oFactura.setCodAdresaClient(facturaObject.getString("codAdresaClient"));
 
 				objectsList.add(oFactura);
 

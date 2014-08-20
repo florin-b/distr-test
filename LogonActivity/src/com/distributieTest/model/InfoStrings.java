@@ -4,8 +4,6 @@
  */
 package com.distributieTest.model;
 
-
-
 import com.distributieTest.view.R;
 
 import android.app.AlertDialog;
@@ -23,8 +21,7 @@ public class InfoStrings {
 
 	public static void setEveniment(Context context, String strEveniment) {
 		try {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("eveniment", strEveniment);
 			editor.commit();
@@ -38,8 +35,7 @@ public class InfoStrings {
 
 		String localEveniment = "";
 		try {
-			SharedPreferences pref2 = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			localEveniment = pref2.getString("eveniment", "-1");
 
 		} catch (Exception e) {
@@ -52,8 +48,7 @@ public class InfoStrings {
 
 	public static void setNrBorderou(Context context, String codBorderou) {
 		try {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("nrBord", codBorderou);
 			editor.commit();
@@ -65,8 +60,7 @@ public class InfoStrings {
 
 	public static void setTipBorderou(Context context, String tipBorderou) {
 		try {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("tipBord", tipBorderou);
 			editor.commit();
@@ -80,8 +74,7 @@ public class InfoStrings {
 
 		String localNrBord = "0";
 		try {
-			SharedPreferences pref2 = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			localNrBord = pref2.getString("nrBord", "0");
 
 		} catch (Exception e) {
@@ -96,8 +89,7 @@ public class InfoStrings {
 
 		String localTipBord = "0";
 		try {
-			SharedPreferences pref2 = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			localTipBord = pref2.getString("tipBord", "0");
 
 		} catch (Exception e) {
@@ -110,8 +102,7 @@ public class InfoStrings {
 
 	public static void setCurentClient(Context context, String strCodClient) {
 		try {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("codClient", strCodClient);
 			editor.commit();
@@ -125,9 +116,35 @@ public class InfoStrings {
 
 		String localCodClient = "0";
 		try {
-			SharedPreferences pref2 = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			localCodClient = pref2.getString("codClient", "0");
+
+		} catch (Exception e) {
+			localCodClient = "-1";
+			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+		}
+
+		return localCodClient;
+	}
+
+	public static void setCurentClientAddr(Context context, String strAdrClient) {
+		try {
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString("adrClient", strAdrClient);
+			editor.commit();
+		} catch (Exception e) {
+			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+		}
+
+	}
+
+	public static String getCurentClientAddr(Context context) {
+
+		String localCodClient = "0";
+		try {
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
+			localCodClient = pref2.getString("adrClient", "0");
 
 		} catch (Exception e) {
 			localCodClient = "-1";
@@ -139,8 +156,7 @@ public class InfoStrings {
 
 	public static void setCurentClientName(Context context, String strCodClient) {
 		try {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("numeClient", strCodClient);
 			editor.commit();
@@ -154,8 +170,7 @@ public class InfoStrings {
 
 		String localNumeClient = "0";
 		try {
-			SharedPreferences pref2 = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			localNumeClient = pref2.getString("numeClient", "0");
 
 		} catch (Exception e) {
@@ -168,8 +183,7 @@ public class InfoStrings {
 
 	public static void setEvenimentClient(Context context, String eveniment) {
 		try {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences sharedPreferences = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("evenimentClient", eveniment);
 			editor.commit();
@@ -183,8 +197,7 @@ public class InfoStrings {
 
 		String localEvenimentClient = "";
 		try {
-			SharedPreferences pref2 = context.getSharedPreferences(
-					"DRIVER_DATA", Context.MODE_PRIVATE);
+			SharedPreferences pref2 = context.getSharedPreferences("DRIVER_DATA", Context.MODE_PRIVATE);
 			localEvenimentClient = pref2.getString("evenimentClient", "-1");
 
 		} catch (Exception e) {
@@ -250,56 +263,42 @@ public class InfoStrings {
 	public static boolean isGPSEnabled(Context context) {
 		boolean statusOfGPS = false;
 		try {
-			LocationManager manager = (LocationManager) context
-					.getSystemService(Context.LOCATION_SERVICE);
-			statusOfGPS = manager
-					.isProviderEnabled(LocationManager.GPS_PROVIDER);
+			LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+			statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 		} catch (Exception ex) {
 			statusOfGPS = false;
 			Log.e("Error", ex.toString());
 		}
-		
-		//TEST!
+
+		// TEST!
 		statusOfGPS = true;
-		
-		
+
 		return statusOfGPS;
 
 	}
 
 	public static void showGPSDisabledAlert(Context context) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				context);
-		alertDialogBuilder.setMessage(
-				"Activati GPS si reluati operatiunea dupa 1 minut!")
-				.setCancelable(false);
-		alertDialogBuilder.setNegativeButton("Inchide",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+		alertDialogBuilder.setMessage("Activati GPS si reluati operatiunea dupa 1 minut!").setCancelable(false);
+		alertDialogBuilder.setNegativeButton("Inchide", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
 		AlertDialog alert = alertDialogBuilder.create();
 		alert.show();
 	}
-	
-	
-	
-	public static void showCustomToast(Context context, String infoMessage)
-	{
+
+	public static void showCustomToast(Context context, String infoMessage) {
 		LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.cust_toast_layout,null);
-        TextView myTextView = (TextView) view.findViewById( R.id.textViewMessage);
-        myTextView.setText(infoMessage);
-        
-        Toast toast = new Toast(context);
-        toast.setView(view);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.show();
+		View view = inflater.inflate(R.layout.cust_toast_layout, null);
+		TextView myTextView = (TextView) view.findViewById(R.id.textViewMessage);
+		myTextView.setText(infoMessage);
+
+		Toast toast = new Toast(context);
+		toast.setView(view);
+		toast.setDuration(Toast.LENGTH_LONG);
+		toast.show();
 	}
-	
-	
-	
-	
 
 }

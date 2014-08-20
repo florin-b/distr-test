@@ -7,16 +7,10 @@ package com.distributieTest.view;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.distributieTest.listeners.AsyncTaskListener;
-import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanFacturiBorderou;
-import com.distributieTest.model.HandleJSONData;
-import com.distributieTest.model.InfoStrings;
-import com.distributieTest.model.UserInfo;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -37,9 +31,17 @@ import android.widget.ProgressBar;
 import android.widget.SlidingDrawer;
 import android.widget.SlidingDrawer.OnDrawerCloseListener;
 import android.widget.SlidingDrawer.OnDrawerOpenListener;
-
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.distributieTest.listeners.AsyncTaskListener;
+import com.distributieTest.model.AsyncTaskWSCall;
+import com.distributieTest.model.BeanFacturiBorderou;
+
+import com.distributieTest.model.EncodeJSONData;
+import com.distributieTest.model.HandleJSONData;
+import com.distributieTest.model.InfoStrings;
+import com.distributieTest.model.UserInfo;
 
 public class Livrare extends Activity implements AsyncTaskListener {
 
@@ -53,7 +55,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 	private CustomAdapter adapterFacturi;
 	private static ArrayList<HashMap<String, String>> arrayListFacturi = new ArrayList<HashMap<String, String>>();
 	ListView listFacturi, listViewArtLivrare;
-	TextView textSelectedBorderou, textSelectedClient, textSelectedClientArt;
+	TextView textSelectedBorderou, textSelectedClient, textSelectedClientArt, textAdresaClient;
 	ProgressWheel pw;
 
 	public static ArrayList<HashMap<String, String>> arrayListArtLivr = null;
@@ -65,6 +67,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 
 	private HashMap<String, String> artMap = null;
 	SlidingDrawer drawerArtLivrare;
+	private ArrayList<BeanFacturiBorderou> facturiArray;
+
+	private String selectedClientCode = "", selectedClientName = "", selectedClientAddr = "";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +99,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 
 			textSelectedClientArt = (TextView) findViewById(R.id.textSelectedClientArt);
 			textSelectedClientArt.setText("");
+
+			textAdresaClient = (TextView) findViewById(R.id.textAdresaClient);
+			textAdresaClient.setText("");
 
 			progressBarEvent = (ProgressBar) findViewById(R.id.progress_bar_event);
 			progressBarEvent.setVisibility(View.INVISIBLE);
@@ -222,7 +230,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 	private void populateListFacturi(String facturi) {
 
 		HandleJSONData objListFacturi = new HandleJSONData(this, facturi);
-		ArrayList<BeanFacturiBorderou> facturiArray = objListFacturi.decodeJSONFacturiBorderou();
+		facturiArray = objListFacturi.decodeJSONFacturiBorderou();
 
 		if (facturiArray.size() > 0) {
 
@@ -439,8 +447,13 @@ public class Livrare extends Activity implements AsyncTaskListener {
 									getApplicationContext().getResources().getColor(R.color.rowColor9));
 					}
 
-					InfoStrings.setCurentClient(getApplicationContext(), artMap.get("codClient"));
-					InfoStrings.setCurentClientName(getApplicationContext(), artMap.get("numeClient"));
+					selectedClientCode = artMap.get("codClient");
+					selectedClientName = artMap.get("numeClient");
+					selectedClientAddr = facturiArray.get(position).getCodAdresaClient();
+
+					InfoStrings.setCurentClient(getApplicationContext(), selectedClientCode);
+					InfoStrings.setCurentClientAddr(getApplicationContext(), selectedClientAddr);
+					InfoStrings.setCurentClientName(getApplicationContext(), selectedClientName);
 
 					selectedPosition = position;
 
@@ -464,6 +477,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 
 					}
 
+					textAdresaClient.setText(facturiArray.get(position).getAdresaClient());
 					textSelectedClient.setText(artMap.get("numeClient"));
 					saveEventClienti.setVisibility(View.VISIBLE);
 
@@ -648,19 +662,26 @@ public class Livrare extends Activity implements AsyncTaskListener {
 
 			startSpinner();
 
-			HashMap<String, String> params = new HashMap<String, String>();
+			HashMap<String, String> newEventData = new HashMap<String, String>();
+			newEventData.put("codSofer", UserInfo.getInstance().getCod());
+			newEventData.put("document", InfoStrings.getNrBorderou(Livrare.this));
+			newEventData.put("client", InfoStrings.getCurentClient(Livrare.this));
+			newEventData.put("codAdresa", InfoStrings.getCurentClientAddr(Livrare.this));
+			newEventData.put("eveniment", InfoStrings.getEvenimentClient(Livrare.this));
+			newEventData.put("truckData", getTruckServiceData());
 
-			params.put("codSofer", UserInfo.getInstance().getCod());
-			params.put("document", InfoStrings.getNrBorderou(Livrare.this));
-			params.put("client", InfoStrings.getCurentClient(Livrare.this));
-			params.put("eveniment", InfoStrings.getEvenimentClient(Livrare.this));
-			params.put("truckData", getTruckServiceData());
+			EncodeJSONData jsonEvLivrare = new EncodeJSONData(this, newEventData);
+			String serializedData = jsonEvLivrare.encodeNewEventData();
+
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("serializedEvent", serializedData);
 
 			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "saveNewEvent", params);
 			call.getCallResults();
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+			stopSpinner();
 		}
 
 	}
@@ -947,9 +968,14 @@ public class Livrare extends Activity implements AsyncTaskListener {
 
 			if (InfoStrings.getEvenimentClient(Livrare.this).equals("S")) {
 				// plecare de la client, reset client curent
-				InfoStrings.setCurentClient(Livrare.this, "0");
+				selectedClientCode = "0";
+				selectedClientName = "0";
+				selectedClientAddr = "0";
 				selectedClientLayout.setVisibility(View.INVISIBLE);
 			}
+			InfoStrings.setCurentClient(getApplicationContext(), selectedClientCode);
+			InfoStrings.setCurentClientAddr(getApplicationContext(), selectedClientAddr);
+			InfoStrings.setCurentClientName(getApplicationContext(), selectedClientName);
 
 			performLoadFacturiBorderou();
 		}
