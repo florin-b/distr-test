@@ -218,7 +218,6 @@ public class Livrare extends Activity implements AsyncTaskListener {
 		startSpinner();
 
 		HashMap<String, String> params = new HashMap<String, String>();
-
 		params.put("nrBorderou", InfoStrings.getNrBorderou(getApplicationContext()));
 		params.put("tipBorderou", InfoStrings.getTipBorderou(getApplicationContext()));
 
@@ -238,6 +237,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 			int locatIntSelectedClient = -1;
 
 			textSelectedClient.setText("");
+			textAdresaClient.setText("");
 			saveEventClienti.setVisibility(View.INVISIBLE);
 
 			listFacturi.setVisibility(View.VISIBLE);
@@ -282,7 +282,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 						temp.put("timpEv2", " ");
 					}
 
-					if (InfoStrings.getCurentClient(getApplicationContext()).equals(facturiArray.get(i).getCodClient())) {
+					if (isClientSelected(facturiArray, i)) {
 						locatIntSelectedClient = i;
 					}
 
@@ -415,6 +415,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 			listFacturi.setAdapter(adapterFacturi);
 
 			if (locatIntSelectedClient != -1) {
+
 				listFacturi.setItemChecked(locatIntSelectedClient, true);
 				listFacturi.performItemClick(listFacturi, locatIntSelectedClient,
 						listFacturi.getItemIdAtPosition(locatIntSelectedClient));
@@ -425,6 +426,11 @@ public class Livrare extends Activity implements AsyncTaskListener {
 			Toast.makeText(getApplicationContext(), "Nu exista facturi!", Toast.LENGTH_LONG).show();
 		}
 
+	}
+
+	boolean isClientSelected(ArrayList<BeanFacturiBorderou> facturiArray, int pos) {
+		return InfoStrings.getCurentClient(getApplicationContext()).equals(facturiArray.get(pos).getCodClient())
+				&& InfoStrings.getCurentClientAddr(this).equals(facturiArray.get(pos).getCodAdresaClient());
 	}
 
 	class myListFacturiOnItemClickListener implements ListView.OnItemClickListener {
@@ -470,11 +476,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 					if (localStrEvClnt.equals("0")) {
 						saveEventClienti.setCompoundDrawablesWithIntrinsicBounds(R.drawable.in1, 0, 0, 0);
 						saveEventClienti.setText("SOSIRE");
-
 					} else {
 						saveEventClienti.setCompoundDrawablesWithIntrinsicBounds(R.drawable.out1, 0, 0, 0);
 						saveEventClienti.setText("PLECARE");
-
 					}
 
 					textAdresaClient.setText(facturiArray.get(position).getAdresaClient());
@@ -497,7 +501,7 @@ public class Livrare extends Activity implements AsyncTaskListener {
 		int ii = 0;
 
 		boolean allOpen = true, isSelectable = false;
-		boolean varClearPos = false, varOpenedPos = false, varClosedPos = false;
+		boolean varClearPos = false, varOpenedPos = false;
 
 		ArrayList<Integer> clearPos = new ArrayList<Integer>();
 		ArrayList<Integer> openedPos = new ArrayList<Integer>();
@@ -543,14 +547,6 @@ public class Livrare extends Activity implements AsyncTaskListener {
 			for (int i = 0; i < openedPos.size(); i++)
 				if (position == openedPos.get(i)) {
 					varOpenedPos = true;
-				}
-
-		}
-
-		if (closedPos.size() > 0) {
-			for (int i = 0; i < closedPos.size(); i++)
-				if (position == closedPos.get(i)) {
-					varClosedPos = true;
 				}
 
 		}

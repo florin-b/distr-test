@@ -32,19 +32,19 @@ public class EncodeJSONData {
 
 		if (paramData.size() > 0) {
 
-			JSONObject adrLivrareCV = new JSONObject();
+			JSONObject tempObject = new JSONObject();
 
 			for (Entry<String, String> entry : paramData.entrySet()) {
 
 				try {
-					adrLivrareCV.put(entry.getKey(), entry.getValue());
+					tempObject.put(entry.getKey(), entry.getValue());
 				} catch (JSONException e) {
 					Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
 				}
 
 			}
 
-			jsonData = adrLivrareCV.toString();
+			jsonData = tempObject.toString();
 
 		}
 

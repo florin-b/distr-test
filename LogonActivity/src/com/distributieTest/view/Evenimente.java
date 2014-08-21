@@ -317,7 +317,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 				temp.put("eveniment", borderouriArray.get(i).getEvenimentBorderou());
 
 				if (selectedPosition == -1) {
-					if (borderouriArray.get(i).getTipBorderou().equals("P")) {
+					if (borderouriArray.get(i).getEvenimentBorderou().equals("P")) {
 						selectedPosition = i;
 					}
 				}
@@ -341,8 +341,8 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			listBorderouri.clear();
 			spinnerBorderouri.setAdapter(adapterBorderouri);
 
-			layoutDetButton.setVisibility(View.INVISIBLE);
-			layoutTotalTrip.setVisibility(View.INVISIBLE);
+			layoutDetButton.setVisibility(View.GONE);
+			layoutTotalTrip.setVisibility(View.GONE);
 			eventButton.setVisibility(View.INVISIBLE);
 			layoutEventOut.setVisibility(View.INVISIBLE);
 			layoutEventIn.setVisibility(View.INVISIBLE);
@@ -442,31 +442,8 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 						layoutTotalTrip.setVisibility(View.VISIBLE);
 
-						String[] strDataStart = textDateEventOut.getText().toString().trim().split("-");
-						String[] strOraStart = textTimeEventOut.getText().toString().trim().split(":");
-
-						Calendar cal1 = Calendar.getInstance();
-						cal1.set(Calendar.YEAR, Integer.valueOf("20" + strDataStart[2]));
-						cal1.set(Calendar.MONTH, Utils.getMonthNumber(strDataStart[1]));
-						cal1.set(Calendar.DAY_OF_MONTH, Integer.valueOf(strDataStart[0]));
-						cal1.set(Calendar.HOUR, Integer.valueOf(strOraStart[0]));
-						cal1.set(Calendar.MINUTE, Integer.valueOf(strOraStart[1]));
-
-						String[] strDataStop = textDateEventIn.getText().toString().trim().split("-");
-						String[] strOraStop = textTimeEventIn.getText().toString().trim().split(":");
-
-						Calendar cal2 = Calendar.getInstance();
-						cal2.set(Calendar.YEAR, Integer.valueOf("20" + strDataStop[2]));
-						cal2.set(Calendar.MONTH, Utils.getMonthNumber(strDataStop[1]));
-						cal2.set(Calendar.DAY_OF_MONTH, Integer.valueOf(strDataStop[0]));
-						cal2.set(Calendar.HOUR, Integer.valueOf(strOraStop[0]));
-						cal2.set(Calendar.MINUTE, Integer.valueOf(strOraStop[1]));
-
-						long milisecs = cal2.getTimeInMillis() - cal1.getTimeInMillis();
-						String strTotalTime = "";
-						strTotalTime = Utils.getDuration(milisecs);
-
-						textTripTime.setText(strTotalTime);
+						textTripTime.setText(getTripTime(textDateEventOut.getText().toString(), textDateEventIn
+								.getText().toString()));
 
 						double startDistance = Double.valueOf(textKmEventOut.getText().toString());
 						double stopDistance = Double.valueOf(textKmEventIn.getText().toString());
@@ -481,10 +458,6 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			} else {
 
 				// nu exista evenimente
-
-				layoutEventOut.setVisibility(View.INVISIBLE);
-				layoutEventIn.setVisibility(View.INVISIBLE);
-
 				layoutEventOut.setVisibility(View.INVISIBLE);
 				layoutEventIn.setVisibility(View.INVISIBLE);
 
@@ -500,6 +473,35 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 		} catch (Exception ex) {
 			Toast.makeText(Evenimente.this, ex.toString(), Toast.LENGTH_LONG).show();
 		}
+
+	}
+
+	private String getTripTime(String timeStart, String timeStop) {
+
+		String[] strDataStart = timeStart.trim().split("-");
+		String[] strOraStart = timeStart.trim().split(":");
+
+		Calendar cal1 = Calendar.getInstance();
+		cal1.set(Calendar.YEAR, Integer.valueOf("20" + strDataStart[2]));
+		cal1.set(Calendar.MONTH, Utils.getMonthNumber(strDataStart[1]));
+		cal1.set(Calendar.DAY_OF_MONTH, Integer.valueOf(strDataStart[0]));
+		cal1.set(Calendar.HOUR, Integer.valueOf(strOraStart[0]));
+		cal1.set(Calendar.MINUTE, Integer.valueOf(strOraStart[1]));
+
+		String[] strDataStop = timeStop.trim().split("-");
+		String[] strOraStop = timeStop.trim().split(":");
+
+		Calendar cal2 = Calendar.getInstance();
+		cal2.set(Calendar.YEAR, Integer.valueOf("20" + strDataStop[2]));
+		cal2.set(Calendar.MONTH, Utils.getMonthNumber(strDataStop[1]));
+		cal2.set(Calendar.DAY_OF_MONTH, Integer.valueOf(strDataStop[0]));
+		cal2.set(Calendar.HOUR, Integer.valueOf(strOraStop[0]));
+		cal2.set(Calendar.MINUTE, Integer.valueOf(strOraStop[1]));
+
+		long milisecs = cal2.getTimeInMillis() - cal1.getTimeInMillis();
+		String strTotalTime = Utils.getDuration(milisecs);
+
+		return strTotalTime;
 
 	}
 
