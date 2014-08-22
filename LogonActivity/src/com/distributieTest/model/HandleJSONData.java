@@ -74,6 +74,7 @@ public class HandleJSONData {
 				oFactura.setAdresaFurnizor(facturaObject.getString("adresaFurnizor"));
 				oFactura.setSosireFurnizor(facturaObject.getString("sosireFurnizor"));
 				oFactura.setPlecareFurnizor(facturaObject.getString("plecareFurnizor"));
+				oFactura.setCodAdresaFurnizor(facturaObject.getString("codAdresaFurnizor"));
 
 				oFactura.setCodClient(facturaObject.getString("codClient"));
 				oFactura.setNumeClient(facturaObject.getString("numeClient"));

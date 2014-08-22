@@ -14,6 +14,7 @@ public class BeanFacturiBorderou {
 	private String adresaFurnizor;
 	private String sosireFurnizor;
 	private String plecareFurnizor;
+	private String codAdresaFurnizor;
 
 	public BeanFacturiBorderou() {
 	}
@@ -104,6 +105,14 @@ public class BeanFacturiBorderou {
 
 	public void setCodAdresaClient(String codAdresaClient) {
 		this.codAdresaClient = codAdresaClient;
+	}
+
+	public String getCodAdresaFurnizor() {
+		return codAdresaFurnizor;
+	}
+
+	public void setCodAdresaFurnizor(String codAdresaFurnizor) {
+		this.codAdresaFurnizor = codAdresaFurnizor;
 	}
 
 	
