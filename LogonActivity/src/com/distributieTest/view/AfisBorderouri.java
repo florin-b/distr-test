@@ -17,94 +17,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.distributieTest.listeners.AsyncTaskListener;
-import com.distributieTest.listeners.CustomSpinnerListener;
-import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanBorderou;
-import com.distributieTest.model.BeanEvenimentBorderou;
-import com.distributieTest.model.HandleJSONData;
-import com.distributieTest.model.UserInfo;
-import com.distributieTest.model.Utils;
+import com.distributieTest.controller.AfisBorderouriController;
 
-public class AfisBorderouri extends Activity implements AsyncTaskListener, CustomSpinnerListener {
-
-	Button eventButton, showDetBtn;
-
-	ProgressBar progressBarEvent;
-
-	private SimpleAdapter adapterBorderouri, adapterEvenimente;
-	private static ArrayList<HashMap<String, String>> listBorderouri = new ArrayList<HashMap<String, String>>();
-	private static ArrayList<HashMap<String, String>> listEvenimente = new ArrayList<HashMap<String, String>>();
-	Spinner spinnerBorderouri;
-
-	ProgressWheel pw;
+public class AfisBorderouri extends Activity {
 
 	private Dialog dialogSelInterval;
 	private String intervalAfisare = "0";
-	private static String selectedBorderou = "0";
-	private ListView listViewEvenimente;
-	private TextView textStartBorderou;
+	private AfisBorderouriView afisBorderouriView;
+	private AfisBorderouriController afisBorderouriController;
 
-	private CustomSpinnerClass borderouClass = new CustomSpinnerClass();
-
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setTheme(R.style.LRTheme);
 		setContentView(R.layout.afiseaza_borderou);
 
-		InitialUISetup();
+		ActionBar actionBar = getActionBar();
+		actionBar.setTitle("Afisare borderou");
+		actionBar.setDisplayHomeAsUpEnabled(true);
 
-	}
+		afisBorderouriView = new AfisBorderouriView(this);
 
-	private void InitialUISetup() {
-
-		try {
-
-			ActionBar actionBar = getActionBar();
-			actionBar.setTitle("Afisare borderou");
-			actionBar.setDisplayHomeAsUpEnabled(true);
-
-			textStartBorderou = (TextView) findViewById(R.id.textStartBorderou);
-			textStartBorderou.setVisibility(View.GONE);
-
-			pw = (ProgressWheel) findViewById(R.id.pw_spinner);
-			pw.setVisibility(View.INVISIBLE);
-
-			spinnerBorderouri = (Spinner) findViewById(R.id.spinnerBorderouri);
-			adapterBorderouri = new SimpleAdapter(this, listBorderouri, R.layout.custom_row_list_borderouri,
-					new String[] { "nrCrt", "codBorderou", "dataBorderou", "nrPozitii", "eveniment" }, new int[] {
-							R.id.textNrCrt, R.id.textCodBorderou, R.id.textDataBorderou, R.id.textTipBorderou,
-							R.id.textEvenimentBorderou });
-
-			spinnerBorderouri.setAdapter(adapterBorderouri);
-			spinnerBorderouri.setVisibility(View.INVISIBLE);
-
-			spinnerBorderouri.setOnItemSelectedListener(borderouClass);
-
-			borderouClass.setListener(this);
-
-			listViewEvenimente = (ListView) findViewById(R.id.listEvenimente);
-			adapterEvenimente = new SimpleAdapter(this, listEvenimente, R.layout.custom_row_list_evenimente,
-					new String[] { "nrCrt", "numeClient", "ev1", "timpEv1", "ev2", "timpEv2" }, new int[] {
-							R.id.textNrCrt, R.id.textNumeClient, R.id.textEv1, R.id.textTimpEv1, R.id.textEv2,
-							R.id.textTimpEv2 });
-
-			listViewEvenimente.setAdapter(adapterEvenimente);
-
-			performIncarcaBorderouri();
-
-		} catch (Exception ex) {
-			Toast.makeText(AfisBorderouri.this, ex.toString(), Toast.LENGTH_SHORT).show();
-		}
+		afisBorderouriController = new AfisBorderouriController(afisBorderouriView);
 
 	}
 
@@ -122,17 +59,6 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 	}
 
-	private void startSpinner() {
-		pw.setVisibility(View.VISIBLE);
-		pw.spin();
-
-	}
-
-	private void stopSpinner() {
-		pw.setVisibility(View.INVISIBLE);
-		pw.stopSpinning();
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -142,7 +68,7 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 			String[] options = { "Astazi", "In ultimele 7 zile", "In ultimele 30 de zile" };
 
-			dialogSelInterval = new Dialog(AfisBorderouri.this);
+			dialogSelInterval = new Dialog(this);
 			dialogSelInterval.setContentView(R.layout.selintervaldialogafiscmd);
 			dialogSelInterval.setTitle("Afiseaza borderourile livrate ");
 
@@ -188,7 +114,7 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 				public void onClick(View v) {
 
-					performIncarcaBorderouri();
+					afisBorderouriController.IncarcaBorderouriInit(intervalAfisare);
 					dialogSelInterval.dismiss();
 
 				}
@@ -199,7 +125,8 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 		case android.R.id.home:
 
-			Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
+			afisBorderouriView = null;
+			Intent nextScreen = new Intent(this, MainMenu.class);
 			startActivity(nextScreen);
 			finish();
 
@@ -210,187 +137,14 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 
 	}
 
-	public void performIncarcaBorderouri() {
-		try {
-
-			startSpinner();
-
-			HashMap<String, String> params = new HashMap<String, String>();
-
-			params.put("codSofer", UserInfo.getInstance().getCod());
-			params.put("interval", intervalAfisare);
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getEvenimenteBorderouri", params);
-			call.getCallResults();
-
-		} catch (Exception e) {
-			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	private void populateListBorderouri(String borderouri) {
-
-		HandleJSONData objListBorderouri = new HandleJSONData(this, borderouri);
-		ArrayList<BeanBorderou> borderouriArray = objListBorderouri.decodeJSONBorderouri();
-
-		if (borderouriArray.size() > 0) {
-
-			spinnerBorderouri.setVisibility(View.VISIBLE);
-			listBorderouri.clear();
-			spinnerBorderouri.setEnabled(true);
-
-			HashMap<String, String> temp;
-
-			for (int i = 0; i < borderouriArray.size(); i++) {
-				temp = new HashMap<String, String>();
-
-				temp.put("nrCrt", String.valueOf(i + 1) + ".");
-				temp.put("codBorderou", borderouriArray.get(i).getNumarBorderou());
-				temp.put("dataBorderou", borderouriArray.get(i).getDataEmiterii());
-				temp.put("nrPozitii", " ");
-				temp.put("eveniment", borderouriArray.get(i).getEvenimentBorderou());
-
-				listBorderouri.add(temp);
-			}
-
-			spinnerBorderouri.setAdapter(adapterBorderouri);
-
-		} else {
-
-			listBorderouri.clear();
-			textStartBorderou.setText("");
-			listEvenimente.clear();
-			listViewEvenimente.setAdapter(adapterEvenimente);
-			Toast.makeText(getApplicationContext(), "Nu exista borderouri!", Toast.LENGTH_SHORT).show();
-
-		}
-
-	}
-
-	public void performGetBorderouEvents() {
-
-		try {
-			startSpinner();
-
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("nrBorderou", selectedBorderou);
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getEvenimenteBorderou", params);
-			call.getCallResults();
-
-		} catch (Exception ex) {
-
-			Toast.makeText(getBaseContext(), ex.toString(), Toast.LENGTH_LONG).show();
-
-		}
-
-	}
-
-	private void populateEventsList(String eventsData) {
-
-		try {
-
-			HandleJSONData objListEvenimente = new HandleJSONData(this, eventsData);
-			ArrayList<BeanEvenimentBorderou> evenimenteArray = objListEvenimente.decodeJSONEvenimentBorderou();
-
-			listEvenimente.clear();
-			textStartBorderou.setVisibility(View.GONE);
-
-			if (evenimenteArray.size() > 0) {
-
-				HashMap<String, String> temp;
-
-				String[] tokenStartClient, varTokStartBord;
-				String strStartBorderou = "";
-				double tripDistance = 0;
-
-				for (int i = 0; i < evenimenteArray.size(); i++) {
-
-					temp = new HashMap<String, String>();
-
-					temp.put("nrCrt", String.valueOf(i + 1) + ".");
-					temp.put("numeClient", evenimenteArray.get(i).getNumeClient());
-					temp.put("codClient", evenimenteArray.get(i).getCodClient());
-
-					temp.put("ev1", "Sosire:");
-					temp.put("ev2", "Plecare:");
-
-					if (!evenimenteArray.get(i).getOraStartCursa().equals("0")) {
-						varTokStartBord = evenimenteArray.get(i).getOraStartCursa().split(":");
-						strStartBorderou = varTokStartBord[0].substring(6, 8) + "-"
-								+ varTokStartBord[0].substring(4, 6) + "-" + varTokStartBord[0].substring(0, 4) + " "
-								+ varTokStartBord[1].substring(0, 2) + ":" + varTokStartBord[1].substring(2, 4);
-					}
-
-					if (!evenimenteArray.get(i).getOraSosireClient().equals("0")) {
-						tokenStartClient = evenimenteArray.get(i).getOraSosireClient().split(":");
-						tripDistance = Double.valueOf(evenimenteArray.get(i).getKmSosireClient())
-								- Double.valueOf(evenimenteArray.get(i).getKmStartCursa());
-
-						temp.put(
-								"timpEv1",
-								tokenStartClient[1].substring(0, 2)
-										+ ":"
-										+ tokenStartClient[1].substring(2, 4)
-										+ " , "
-										+ Utils.getDuration2(evenimenteArray.get(i).getOraStartCursa(), evenimenteArray
-												.get(i).getOraSosireClient()) + " , "
-										+ String.format("%.2f", tripDistance) + " km");
-					}
-
-					if (!evenimenteArray.get(i).getOraPlecare().equals("0")) {
-						temp.put("timpEv2", evenimenteArray.get(i).getOraPlecare().substring(0, 2) + ":"
-								+ evenimenteArray.get(i).getOraPlecare().substring(2, 4));
-					}
-
-					listEvenimente.add(temp);
-				}
-
-				textStartBorderou.setText("Start borderou " + strStartBorderou);
-				textStartBorderou.setVisibility(View.VISIBLE);
-
-				listViewEvenimente.setAdapter(adapterEvenimente);
-
-			} else {
-
-			}
-
-		} catch (Exception ex) {
-			Toast.makeText(AfisBorderouri.this, "eroare " + ex.toString(), Toast.LENGTH_LONG).show();
-		}
-
-	}
-
 	@Override
 	public void onBackPressed() {
 
+		afisBorderouriView = null;
 		Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 		startActivity(nextScreen);
 		finish();
 		return;
-	}
-
-	@Override
-	public void onTaskComplete(String methodName, String result) {
-		if (methodName.equals("getEvenimenteBorderouri")) {
-			stopSpinner();
-			populateListBorderouri(result);
-		}
-
-		if (methodName.equals("getEvenimenteBorderou")) {
-			stopSpinner();
-			populateEventsList(result);
-		}
-
-	}
-
-	@Override
-	public void onSelectedSpinnerItem(int spinnerId, HashMap<String, String> map) {
-
-		if (spinnerId == R.id.spinnerBorderouri) {
-			selectedBorderou = map.get("codBorderou");
-			performGetBorderouEvents();
-		}
-
 	}
 
 }

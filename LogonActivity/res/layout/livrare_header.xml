@@ -52,7 +52,8 @@
                 android:layout_marginBottom="20dip"
                 android:layout_marginLeft="10dip"
                 android:layout_marginTop="20dip"
-                android:background="#FBFBFB" />
+                android:background="#FBFBFB"
+                />
         </LinearLayout>
 
         <View
@@ -61,8 +62,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="10dip"
-            android:layout_weight="0.03"
-             >
+            android:layout_weight="0.01" >
         </View>
 
         <LinearLayout
@@ -102,31 +102,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left|center"
-                android:layout_marginTop="25dip"
+                android:layout_marginTop="15dip"
                 android:gravity="left"
                 android:textColor="@color/rowColor7"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:typeface="monospace" />
-            
-			<TextView
-			    android:id="@+id/textAdresaClient"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_gravity="left|center"
-			    android:layout_marginTop="10dip"
-			    android:gravity="left"
-			    android:textColor="@color/rowColor6"
-			    android:textSize="24sp"
-			    android:textStyle="normal"
-			    android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/textAdresaClient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center"
+                android:layout_marginTop="10dip"
+                android:gravity="left"
+                android:textColor="@color/rowColor6"
+                android:textSize="24sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
 
             <ProgressBar
                 android:id="@+id/progress_bar_event"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="15dip"
-                android:layout_marginTop="40dip"
+                android:layout_marginTop="30dip"
                 android:max="50"
                 android:progressDrawable="@drawable/progress_bar_style_1" />
 
@@ -144,7 +144,7 @@
                 style="@style/btnStyleEvent2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="90dip"
+                android:layout_marginTop="40dip"
                 android:paddingLeft="40dip"
                 android:paddingRight="40dip"
                 android:text="Articole" />

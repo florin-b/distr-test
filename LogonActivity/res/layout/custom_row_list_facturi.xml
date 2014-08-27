@@ -42,6 +42,23 @@
             android:layout_gravity="bottom|right"
             android:layout_weight="0.0"
             android:textSize="1sp" />
+        
+        <TextView
+            android:id="@+id/textTipClient"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_weight="0.0"
+            android:textSize="1sp" />
+                
+        <TextView
+            android:id="@+id/textCodAdresa"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_weight="0.0"
+            android:textSize="1sp" />        
+        
     </LinearLayout>
 
     <LinearLayout

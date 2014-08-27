@@ -1,6 +1,7 @@
 package com.distributieTest.model;
 
 import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +84,8 @@ public class HandleJSONData {
 				oFactura.setPlecareClient(facturaObject.getString("plecareClient"));
 				oFactura.setCodAdresaClient(facturaObject.getString("codAdresaClient"));
 
+				oFactura.setDataStartCursa(facturaObject.getString("dataStartCursa"));
+
 				objectsList.add(oFactura);
 
 			}
@@ -113,6 +116,8 @@ public class HandleJSONData {
 				eveniment.setOraSosireClient(evenimentObject.getString("oraSosireClient"));
 				eveniment.setKmSosireClient(evenimentObject.getString("kmSosireClient"));
 				eveniment.setOraPlecare(evenimentObject.getString("oraPlecare"));
+				eveniment.setCodAdresa(evenimentObject.getString("codAdresa"));
+				eveniment.setAdresa(evenimentObject.getString("adresa"));
 
 				objectList.add(eveniment);
 
@@ -144,6 +149,38 @@ public class HandleJSONData {
 				eveniment.setDistantaKM(evenimentObject.getString("distantaKM"));
 
 				objectList.add(eveniment);
+
+			}
+
+		} catch (JSONException e) {
+			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+		}
+
+		return objectList;
+
+	}
+
+	public ArrayList<BeanArticoleFactura> decodeJSONArticoleFactura() {
+		BeanArticoleFactura articol = null;
+		ArrayList<BeanArticoleFactura> objectList = new ArrayList<BeanArticoleFactura>();
+
+		try {
+			jsonObject = new JSONArray(JSONString);
+
+			for (int i = 0; i < jsonObject.length(); i++) {
+				JSONObject articolObject = jsonObject.getJSONObject(i);
+
+				articol = new BeanArticoleFactura();
+
+				articol.setNume(articolObject.getString("nume"));
+				articol.setCantitate(articolObject.getString("cantitate"));
+				articol.setUmCant(articolObject.getString("umCant"));
+				articol.setTipOperatiune(articolObject.getString("tipOperatiune"));
+				articol.setDepartament(articolObject.getString("departament"));
+				articol.setGreutate(articolObject.getString("greutate"));
+				articol.setUmGreutate(articolObject.getString("umGreutate"));
+
+				objectList.add(articol);
 
 			}
 

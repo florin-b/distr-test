@@ -214,8 +214,6 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 	}
 
 	class myDetBtnOnClickListener implements Button.OnClickListener {
-
-		@Override
 		public void onClick(View arg0) {
 			Intent nextScreen = new Intent(Evenimente.this, Livrare.class);
 			startActivity(nextScreen);
@@ -286,6 +284,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 			HashMap<String, String> params = new HashMap<String, String>();
 			params.put("codSofer", UserInfo.getInstance().getCod());
+			params.put("tip", "d");
 			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getBorderouri", params);
 			call.getCallResults();
 

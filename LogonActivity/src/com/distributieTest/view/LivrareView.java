@@ -7,24 +7,17 @@ package com.distributieTest.view;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.os.Handler;
-import android.text.style.ClickableSpan;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -39,9 +32,10 @@ import android.widget.Toast;
 
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.model.AsyncTaskWSCall;
+import com.distributieTest.model.BeanArticoleFactura;
 import com.distributieTest.model.BeanFacturiBorderou;
-
 import com.distributieTest.model.EncodeJSONData;
+import com.distributieTest.model.FacturiBorderou;
 import com.distributieTest.model.HandleJSONData;
 import com.distributieTest.model.InfoStrings;
 import com.distributieTest.model.UserInfo;
@@ -76,17 +70,6 @@ public class LivrareView implements AsyncTaskListener {
 
 	private Activity context;
 
-	/*
-	 * @Override public void onCreate(Bundle savedInstanceState) {
-	 * super.onCreate(savedInstanceState);
-	 * 
-	 * setTheme(R.style.LRTheme); setContentView(R.layout.livrare);
-	 * 
-	 * InitialUISetup();
-	 * 
-	 * }
-	 */
-
 	public LivrareView(Activity context) {
 		this.context = context;
 		InitialUISetup();
@@ -114,8 +97,6 @@ public class LivrareView implements AsyncTaskListener {
 
 			saveEventClienti = (Button) context.findViewById(R.id.saveEventClienti);
 			saveEventClienti.setVisibility(View.INVISIBLE);
-			// saveEventClienti.setOnTouchListener(new
-			// myEvtClientiOnTouchListener());
 
 			selectedClientLayout = (LinearLayout) context.findViewById(R.id.selectedClientLayout);
 			selectedClientLayout.setVisibility(View.INVISIBLE);
@@ -226,7 +207,6 @@ public class LivrareView implements AsyncTaskListener {
 		if (facturiArray.size() > 0) {
 
 			arrayListFacturi.clear();
-			int locatIntSelectedClient = -1;
 
 			textSelectedClient.setText("");
 			textAdresaClient.setText("");
@@ -234,180 +214,18 @@ public class LivrareView implements AsyncTaskListener {
 
 			listFacturi.setVisibility(View.VISIBLE);
 
-			HashMap<String, String> temp = null;
+			FacturiBorderou facturiBorderou = new FacturiBorderou(context);
+			adapterFacturi = facturiBorderou.getFacturiBorderouAdapter(facturiArray,
+					InfoStrings.getTipBorderou(context));
 
-			if (InfoStrings.getTipBorderou(context).toLowerCase(Locale.getDefault()).equals("distributie")) {
-
-				adapterFacturi = new CustomAdapter(context, arrayListFacturi, R.layout.custom_row_list_facturi,
-						new String[] { "nrCrt", "numeClient", "codClient", "adresaClient", "ev1", "timpEv1", "ev2",
-								"timpEv2" }, new int[] { R.id.textNrCrt, R.id.textNumeClient, R.id.textAdresaClient,
-								R.id.textCodClient, R.id.textEv1, R.id.textTimpEv1, R.id.textEv2, R.id.textTimpEv2 });
-				listFacturi.setAdapter(adapterFacturi);
-
-				for (int i = 0; i < facturiArray.size(); i++) {
-					temp = new HashMap<String, String>();
-
-					temp.put("nrCrt", String.valueOf(i + 1) + ".");
-					temp.put("numeClient", facturiArray.get(i).getNumeClient());
-					temp.put("codClient", facturiArray.get(i).getCodClient());
-					temp.put("adresaClient", facturiArray.get(i).getAdresaClient());
-
-					if (!facturiArray.get(i).getSosireClient().equals("0")) {
-						temp.put("ev1", "Sosire:");
-						temp.put("timpEv1", facturiArray.get(i).getSosireClient().substring(0, 2) + ":"
-								+ facturiArray.get(i).getSosireClient().substring(2, 4) + ":"
-								+ facturiArray.get(i).getSosireClient().substring(4, 6));
-					} else {
-						temp.put("ev1", " ");
-						temp.put("timpEv1", " ");
-					}
-
-					if (!facturiArray.get(i).getPlecareClient().equals("0")) {
-						temp.put("ev2", "Plecare:");
-						temp.put("timpEv2", facturiArray.get(i).getPlecareClient().substring(0, 2) + ":"
-								+ facturiArray.get(i).getPlecareClient().substring(2, 4) + ":"
-								+ facturiArray.get(i).getPlecareClient().substring(4, 6));
-					} else {
-
-						temp.put("ev2", " ");
-						temp.put("timpEv2", " ");
-					}
-
-					if (isClientSelected(facturiArray, i)) {
-						locatIntSelectedClient = i;
-					}
-
-					arrayListFacturi.add(temp);
-				}
-
-			}// sf. distributie
-
-			// aprovizionare
-			if (InfoStrings.getTipBorderou(context).toLowerCase(Locale.getDefault()).equals("aprovizionare")) {
-
-				adapterFacturi = new CustomAdapter(context, arrayListFacturi, R.layout.custom_row_list_facturi_aprov,
-						new String[] { "nrCrt", "numeClient", "codClient", "ev1", "timpEv1", "ev2", "timpEv2",
-								"adresaClient" }, new int[] { R.id.textNrCrt, R.id.textNumeClient, R.id.textCodClient,
-								R.id.textEv1, R.id.textTimpEv1, R.id.textEv2, R.id.textTimpEv2, R.id.textAdresaClient });
-				listFacturi.setAdapter(adapterFacturi);
-
-				int lastIndex = 1;
-
-				for (int i = 0; i < facturiArray.size(); i++) {
-					temp = new HashMap<String, String>();
-
-					if (0 == i) {
-
-						temp.put("nrCrt", String.valueOf(lastIndex) + ".");
-						lastIndex++;
-						temp.put("numeClient", facturiArray.get(i).getNumeFurnizor());
-						temp.put("codClient", facturiArray.get(i).getCodFurnizor());
-						temp.put("adresaClient", facturiArray.get(i).getAdresaFurnizor());
-
-						if (!facturiArray.get(i).getSosireFurnizor().equals("0")) {
-							temp.put("ev1", "Sosire:");
-							temp.put("timpEv1",
-									facturiArray.get(i).getSosireFurnizor().substring(0, 2) + ":"
-											+ facturiArray.get(i).getSosireFurnizor().substring(2, 4) + ":"
-											+ facturiArray.get(i).getSosireFurnizor().substring(4, 6));
-						} else {
-							temp.put("ev1", " ");
-							temp.put("timpEv1", " ");
-						}
-
-						if (!facturiArray.get(i).getPlecareFurnizor().equals("0")) {
-							temp.put("ev2", "Plecare:");
-							temp.put("timpEv2", facturiArray.get(i).getPlecareFurnizor().substring(0, 2) + ":"
-									+ facturiArray.get(i).getPlecareFurnizor().substring(2, 4) + ":"
-									+ facturiArray.get(i).getPlecareFurnizor().substring(4, 6));
-						} else {
-
-							temp.put("ev2", " ");
-							temp.put("timpEv2", " ");
-						}
-
-						arrayListFacturi.add(temp);
-
-						temp = new HashMap<String, String>();
-
-						temp.put("nrCrt", String.valueOf(lastIndex) + ".");
-						lastIndex++;
-						temp.put("numeClient", facturiArray.get(i).getNumeClient());
-						temp.put("codClient", facturiArray.get(i).getCodClient());
-						temp.put("adresaClient", facturiArray.get(i).getAdresaClient());
-
-						if (!facturiArray.get(i).getSosireClient().equals("0")) {
-							temp.put("ev1", "Sosire:");
-							temp.put("timpEv1", facturiArray.get(i).getSosireClient().substring(0, 2) + ":"
-									+ facturiArray.get(i).getSosireClient().substring(2, 4) + ":"
-									+ facturiArray.get(i).getSosireClient().substring(4, 6));
-						} else {
-							temp.put("ev1", " ");
-							temp.put("timpEv1", " ");
-						}
-
-						if (!facturiArray.get(i).getPlecareClient().equals("0")) {
-							temp.put("ev2", "Plecare:");
-							temp.put("timpEv2", facturiArray.get(i).getPlecareClient().substring(0, 2) + ":"
-									+ facturiArray.get(i).getPlecareClient().substring(2, 4) + ":"
-									+ facturiArray.get(i).getPlecareClient().substring(4, 6));
-						} else {
-
-							temp.put("ev2", " ");
-							temp.put("timpEv2", " ");
-						}
-
-						arrayListFacturi.add(temp);
-
-					} else {
-
-						temp.put("nrCrt", String.valueOf(lastIndex) + ".");
-						lastIndex++;
-
-						temp.put("numeClient", facturiArray.get(i).getNumeClient());
-						temp.put("codClient", facturiArray.get(i).getCodClient());
-						temp.put("adresaClient", facturiArray.get(i).getAdresaClient());
-
-						if (!facturiArray.get(i).getSosireClient().equals("0")) {
-							temp.put("ev1", "Sosire:");
-							temp.put("timpEv1", facturiArray.get(i).getSosireClient().substring(0, 2) + ":"
-									+ facturiArray.get(i).getSosireClient().substring(2, 4) + ":"
-									+ facturiArray.get(i).getSosireClient().substring(4, 6));
-						} else {
-							temp.put("ev1", " ");
-							temp.put("timpEv1", " ");
-						}
-
-						if (!facturiArray.get(i).getPlecareClient().equals("0")) {
-							temp.put("ev2", "Plecare:");
-							temp.put("timpEv2", facturiArray.get(i).getPlecareClient().substring(0, 2) + ":"
-									+ facturiArray.get(i).getPlecareClient().substring(2, 4) + ":"
-									+ facturiArray.get(i).getPlecareClient().substring(4, 6));
-						} else {
-
-							temp.put("ev2", " ");
-							temp.put("timpEv2", " ");
-						}
-
-						arrayListFacturi.add(temp);
-
-					}
-
-					if (InfoStrings.getCurentClient(context).equals(facturiArray.get(i).getCodFurnizor())) {
-						locatIntSelectedClient = i;
-					}
-
-				}
-
-			}// sf. aprovizionare
-
+			arrayListFacturi = facturiBorderou.getArrayListFacturi();
 			listFacturi.setAdapter(adapterFacturi);
 
-			if (locatIntSelectedClient != -1) {
+			if (facturiBorderou.getSelectedClientIndex() != -1) {
 
-				listFacturi.setItemChecked(locatIntSelectedClient, true);
-				listFacturi.performItemClick(listFacturi, locatIntSelectedClient,
-						listFacturi.getItemIdAtPosition(locatIntSelectedClient));
+				listFacturi.setItemChecked(facturiBorderou.getSelectedClientIndex(), true);
+				listFacturi.performItemClick(listFacturi, facturiBorderou.getSelectedClientIndex(),
+						listFacturi.getItemIdAtPosition(facturiBorderou.getSelectedClientIndex()));
 
 			}
 
@@ -436,15 +254,16 @@ public class LivrareView implements AsyncTaskListener {
 
 					artMap = (HashMap<String, String>) adapterFacturi.getItem(position);
 
-					if (selectedPosition != -1) {
-						if (parent.getChildAt(selectedPosition) != null)
-							parent.getChildAt(selectedPosition).setBackgroundColor(
-									context.getResources().getColor(R.color.rowColor9));
-					}
+					/*
+					 * if (selectedPosition != -1) { if
+					 * (parent.getChildAt(selectedPosition) != null)
+					 * parent.getChildAt(selectedPosition).setBackgroundColor(
+					 * context.getResources().getColor(R.color.rowColor9)); }
+					 */
 
 					selectedClientCode = artMap.get("codClient");
 					selectedClientName = artMap.get("numeClient");
-					selectedClientAddr = facturiArray.get(position).getCodAdresaClient();
+					selectedClientAddr = artMap.get("codAdresa");
 
 					InfoStrings.setCurentClient(context, selectedClientCode);
 					InfoStrings.setCurentClientAddr(context, selectedClientAddr);
@@ -452,7 +271,7 @@ public class LivrareView implements AsyncTaskListener {
 
 					selectedPosition = position;
 
-					view.setBackgroundColor(context.getResources().getColor(R.color.rowColor8));
+					// view.setBackgroundColor(context.getResources().getColor(R.color.rowColor8));
 
 					textSelectedClient.setVisibility(View.VISIBLE);
 
@@ -470,7 +289,7 @@ public class LivrareView implements AsyncTaskListener {
 						saveEventClienti.setText("PLECARE");
 					}
 
-					textAdresaClient.setText(facturiArray.get(position).getAdresaClient());
+					textAdresaClient.setText(artMap.get("adresaClient"));
 					textSelectedClient.setText(artMap.get("numeClient"));
 					saveEventClienti.setVisibility(View.VISIBLE);
 
@@ -710,13 +529,14 @@ public class LivrareView implements AsyncTaskListener {
 
 	private void displayArticoleData(String articoleData) {
 
-		if (!articoleData.equals("-1")) {
+		HandleJSONData objListArticole = new HandleJSONData(context, articoleData);
+		ArrayList<BeanArticoleFactura> articoleArray = objListArticole.decodeJSONArticoleFactura();
+
+		if (articoleArray.size() > 0) {
 			arrayListArtLivr.clear();
 
 			boolean isDescarcat = false, isIncarcat = false;
 
-			String[] mainToken = articoleData.split("@@");
-			String[] tokenLinie;
 
 			HashMap<String, String> temp = null;
 
@@ -729,12 +549,12 @@ public class LivrareView implements AsyncTaskListener {
 			double valMasa = 0, valMasaIncarcare = 0, valMasaDescarcare = 0;
 			int nrCrt = 1;
 
-			for (int i = 0; i < mainToken.length; i++) {
+			for (int i = 0; i < articoleArray.size(); i++) {
 
-				tokenLinie = mainToken[i].split("#");
+				
 				valMasa = 0;
 
-				if (tokenLinie[3].equals("descarcare")) {
+				if (articoleArray.get(i).getTipOperatiune().equals("descarcare")) {
 
 					if (!isDescarcat) {
 						temp = new HashMap<String, String>();
@@ -750,37 +570,38 @@ public class LivrareView implements AsyncTaskListener {
 						isDescarcat = true;
 					}
 
-					if (tokenLinie[6].toUpperCase(Locale.getDefault()).equals("G")) {
-						valMasa = Double.parseDouble(tokenLinie[5]) / 1000;
+					if (articoleArray.get(i).getUmGreutate().toUpperCase(Locale.getDefault()).equals("G")) {
+						valMasa = Double.parseDouble(articoleArray.get(i).getGreutate()) / 1000;
 					}
 
-					if (tokenLinie[6].toUpperCase(Locale.getDefault()).equals("KG")) {
-						valMasa = Double.parseDouble(tokenLinie[5]);
+					if (articoleArray.get(i).getUmGreutate().toUpperCase(Locale.getDefault()).equals("KG")) {
+						valMasa = Double.parseDouble(articoleArray.get(i).getGreutate());
 					}
 
-					if (tokenLinie[6].toUpperCase(Locale.getDefault()).equals("T")) {
-						valMasa = Double.parseDouble(tokenLinie[5]) * 1000;
+					if (articoleArray.get(i).getUmGreutate().toUpperCase(Locale.getDefault()).equals("T")) {
+						valMasa = Double.parseDouble(articoleArray.get(i).getGreutate()) * 1000;
 					}
 
 					// depart. feronerie
-					if (tokenLinie[4].equals("02")) {
+					if (articoleArray.get(i).getDepartament().equals("02")) {
 						totalMasaFeronerieDescarcare += valMasa;
 					}
 
 					// depart electrice
-					if (tokenLinie[4].equals("05")) {
+					if (articoleArray.get(i).getDepartament().equals("05")) {
 						totalMasaElectriceDescarcare += valMasa;
 					}
 
-					if (!tokenLinie[4].equals("05") && !tokenLinie[4].equals("02")) {
+					if (!articoleArray.get(i).getDepartament().equals("05")
+							&& !articoleArray.get(i).getDepartament().equals("02")) {
 						temp = new HashMap<String, String>();
 						temp.put("nrCrt", String.valueOf(nrCrt) + ".");
-						temp.put("numeArticol", tokenLinie[0]);
-						temp.put("cantitate", tokenLinie[1]);
-						temp.put("unitMas", tokenLinie[2]);
-						temp.put("tipOp", tokenLinie[3]);
-						temp.put("greutate", nf2.format(Double.valueOf(tokenLinie[5])));
-						temp.put("umGreutate", tokenLinie[6]);
+						temp.put("numeArticol", articoleArray.get(i).getNume());
+						temp.put("cantitate", articoleArray.get(i).getCantitate());
+						temp.put("unitMas", articoleArray.get(i).getUmCant());
+						temp.put("tipOp", articoleArray.get(i).getTipOperatiune());
+						temp.put("greutate", nf2.format(Double.valueOf(articoleArray.get(i).getGreutate())));
+						temp.put("umGreutate", articoleArray.get(i).getUmGreutate());
 
 						arrayListArtLivr.add(temp);
 
@@ -789,7 +610,7 @@ public class LivrareView implements AsyncTaskListener {
 					}
 				}
 
-				if (tokenLinie[3].equals("incarcare")) {
+				if (articoleArray.get(i).getTipOperatiune().equals("incarcare")) {
 
 					if (!isIncarcat) {
 
@@ -808,37 +629,38 @@ public class LivrareView implements AsyncTaskListener {
 
 					}
 
-					if (tokenLinie[6].toUpperCase(Locale.getDefault()).equals("G")) {
-						valMasa = Double.parseDouble(tokenLinie[5]) / 1000;
+					if (articoleArray.get(i).getUmGreutate().toUpperCase(Locale.getDefault()).equals("G")) {
+						valMasa = Double.parseDouble(articoleArray.get(i).getGreutate()) / 1000;
 					}
 
-					if (tokenLinie[6].toUpperCase(Locale.getDefault()).equals("KG")) {
-						valMasa = Double.parseDouble(tokenLinie[5]);
+					if (articoleArray.get(i).getUmGreutate().toUpperCase(Locale.getDefault()).equals("KG")) {
+						valMasa = Double.parseDouble(articoleArray.get(i).getGreutate());
 					}
 
-					if (tokenLinie[6].toUpperCase(Locale.getDefault()).equals("T")) {
-						valMasa = Double.parseDouble(tokenLinie[5]) * 1000;
+					if (articoleArray.get(i).getUmGreutate().toUpperCase(Locale.getDefault()).equals("T")) {
+						valMasa = Double.parseDouble(articoleArray.get(i).getGreutate()) * 1000;
 					}
 
 					// depart. feronerie
-					if (tokenLinie[4].equals("02")) {
+					if (articoleArray.get(i).getDepartament().equals("02")) {
 						totalMasaFeronerieIncarcare += valMasa;
 					}
 
 					// depart electrice
-					if (tokenLinie[4].equals("05")) {
+					if (articoleArray.get(i).getDepartament().equals("05")) {
 						totalMasaElectriceIncarcare += valMasa;
 					}
 
-					if (!tokenLinie[4].equals("05") && !tokenLinie[4].equals("02")) {
+					if (!articoleArray.get(i).getDepartament().equals("05")
+							&& !articoleArray.get(i).getDepartament().equals("02")) {
 						temp = new HashMap<String, String>();
 						temp.put("nrCrt", String.valueOf(nrCrt) + ".");
-						temp.put("numeArticol", tokenLinie[0]);
-						temp.put("cantitate", tokenLinie[1]);
-						temp.put("unitMas", tokenLinie[2]);
-						temp.put("tipOp", tokenLinie[3]);
-						temp.put("greutate", nf2.format(Double.valueOf(tokenLinie[5])));
-						temp.put("umGreutate", tokenLinie[6]);
+						temp.put("numeArticol", articoleArray.get(i).getNume());
+						temp.put("cantitate", articoleArray.get(i).getCantitate());
+						temp.put("unitMas", articoleArray.get(i).getUmCant());
+						temp.put("tipOp", articoleArray.get(i).getTipOperatiune());
+						temp.put("greutate", nf2.format(Double.valueOf(articoleArray.get(i).getGreutate())));
+						temp.put("umGreutate", articoleArray.get(i).getGreutate());
 						arrayListArtLivr.add(temp);
 
 						valMasaIncarcare += valMasa;

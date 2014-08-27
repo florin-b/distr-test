@@ -15,6 +15,8 @@ public class BeanFacturiBorderou {
 	private String sosireFurnizor;
 	private String plecareFurnizor;
 	private String codAdresaFurnizor;
+	
+	private String dataStartCursa;
 
 	public BeanFacturiBorderou() {
 	}
@@ -113,6 +115,14 @@ public class BeanFacturiBorderou {
 
 	public void setCodAdresaFurnizor(String codAdresaFurnizor) {
 		this.codAdresaFurnizor = codAdresaFurnizor;
+	}
+
+	public String getDataStartCursa() {
+		return dataStartCursa;
+	}
+
+	public void setDataStartCursa(String dataStartCursa) {
+		this.dataStartCursa = dataStartCursa;
 	}
 
 	

@@ -21,7 +21,7 @@ public class Livrare extends Activity {
 		actionBar.setTitle("Livrare");
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		LivrareController livrareController = new LivrareController(new LivrareView(this));
+		new LivrareController(new LivrareView(this));
 
 	}
 

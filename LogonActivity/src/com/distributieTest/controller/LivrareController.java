@@ -4,10 +4,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
+
 import com.distributieTest.model.InfoStrings;
 import com.distributieTest.view.LivrareView;
 
-public class LivrareController {
+public class LivrareController  {
 
 	private LivrareView livrareView;
 
@@ -40,5 +41,7 @@ public class LivrareController {
 			}
 		});
 	}
+
+	
 
 }

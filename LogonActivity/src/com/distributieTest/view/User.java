@@ -60,8 +60,7 @@ public class User extends Activity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 
-			Intent nextScreen = new Intent(getApplicationContext(),
-					MainMenu.class);
+			Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 			startActivity(nextScreen);
 			finish();
 

@@ -22,7 +22,7 @@ public class BorderouriAdapter extends SimpleAdapter {
 
 	
 
-	private int[] colorTipBorderou = { 0x30B2DFEE, 0x3090EE90, 0x30FFFFE0,
+	private int[] colorTipBorderou = { 0x30EEAD0E, 0x302AC778, 0x30FFFFE0,
 			0x30FAFAD2, 0x30C5C1AA };
 	private String[] tipBorderou = { "Distributie", "Aprovizionare", "Service",
 			"Inchiriere", "Paleti" };

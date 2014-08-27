@@ -4,6 +4,8 @@ public class BeanEvenimentBorderou {
 
 	private String numeClient;
 	private String codClient;
+	private String codAdresa;
+	private String adresa;
 	private String oraStartCursa;
 	private String kmStartCursa;
 	private String oraSosireClient;
@@ -68,6 +70,22 @@ public class BeanEvenimentBorderou {
 
 	public void setOraPlecare(String oraPlecare) {
 		this.oraPlecare = oraPlecare;
+	}
+
+	public String getCodAdresa() {
+		return codAdresa;
+	}
+
+	public void setCodAdresa(String codAdresa) {
+		this.codAdresa = codAdresa;
+	}
+
+	public String getAdresa() {
+		return adresa;
+	}
+
+	public void setAdresa(String adresa) {
+		this.adresa = adresa;
 	}
 
 }

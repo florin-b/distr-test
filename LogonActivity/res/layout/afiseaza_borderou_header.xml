@@ -24,13 +24,14 @@
 
         <TextView
             android:id="@+id/textStartBorderou"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|left"
             android:layout_marginLeft="10dip"
-            android:layout_marginTop="10dip"
+            android:layout_marginTop="20dip"
             android:gravity="bottom|left"
             android:textColor="@color/rowColor7"
+            android:background="@color/backColorArtList"
             android:textSize="25sp"
             android:textStyle="normal"
             android:typeface="sans" />
@@ -41,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
             android:layout_marginLeft="10dip"
-            android:layout_marginTop="10dip" />
+            android:layout_marginTop="20dip" />
     </LinearLayout>
 
     <LinearLayout
