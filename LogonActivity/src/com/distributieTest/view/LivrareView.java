@@ -30,10 +30,10 @@ import android.widget.SlidingDrawer.OnDrawerOpenListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.distributieTest.beans.ArticoleFactura;
+import com.distributieTest.beans.Factura;
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanArticoleFactura;
-import com.distributieTest.model.BeanFacturiBorderou;
 import com.distributieTest.model.EncodeJSONData;
 import com.distributieTest.model.FacturiBorderou;
 import com.distributieTest.model.HandleJSONData;
@@ -64,7 +64,7 @@ public class LivrareView implements AsyncTaskListener {
 
 	private HashMap<String, String> artMap = null;
 	SlidingDrawer drawerArtLivrare;
-	private ArrayList<BeanFacturiBorderou> facturiArray;
+	private ArrayList<Factura> facturiArray;
 
 	private String selectedClientCode = "", selectedClientName = "", selectedClientAddr = "";
 
@@ -130,6 +130,8 @@ public class LivrareView implements AsyncTaskListener {
 					textSelectedBorderou.setText(" Borderou " + InfoStrings.getNrBorderou(context) + " ");
 				}
 			}
+
+			selectedPosition = -1;
 
 			arrayListArtLivr = new ArrayList<HashMap<String, String>>();
 
@@ -221,7 +223,8 @@ public class LivrareView implements AsyncTaskListener {
 			arrayListFacturi = facturiBorderou.getArrayListFacturi();
 			listFacturi.setAdapter(adapterFacturi);
 
-			if (facturiBorderou.getSelectedClientIndex() != -1) {
+			listFacturi.setSelection(selectedPosition);
+			if (facturiBorderou.getSelectedClientIndex() != 0) {
 
 				listFacturi.setItemChecked(facturiBorderou.getSelectedClientIndex(), true);
 				listFacturi.performItemClick(listFacturi, facturiBorderou.getSelectedClientIndex(),
@@ -235,7 +238,7 @@ public class LivrareView implements AsyncTaskListener {
 
 	}
 
-	boolean isClientSelected(ArrayList<BeanFacturiBorderou> facturiArray, int pos) {
+	boolean isClientSelected(ArrayList<Factura> facturiArray, int pos) {
 		return InfoStrings.getCurentClient(context).equals(facturiArray.get(pos).getCodClient())
 				&& InfoStrings.getCurentClientAddr(context).equals(facturiArray.get(pos).getCodAdresaClient());
 	}
@@ -254,13 +257,6 @@ public class LivrareView implements AsyncTaskListener {
 
 					artMap = (HashMap<String, String>) adapterFacturi.getItem(position);
 
-					/*
-					 * if (selectedPosition != -1) { if
-					 * (parent.getChildAt(selectedPosition) != null)
-					 * parent.getChildAt(selectedPosition).setBackgroundColor(
-					 * context.getResources().getColor(R.color.rowColor9)); }
-					 */
-
 					selectedClientCode = artMap.get("codClient");
 					selectedClientName = artMap.get("numeClient");
 					selectedClientAddr = artMap.get("codAdresa");
@@ -270,8 +266,6 @@ public class LivrareView implements AsyncTaskListener {
 					InfoStrings.setCurentClientName(context, selectedClientName);
 
 					selectedPosition = position;
-
-					// view.setBackgroundColor(context.getResources().getColor(R.color.rowColor8));
 
 					textSelectedClient.setVisibility(View.VISIBLE);
 
@@ -475,7 +469,7 @@ public class LivrareView implements AsyncTaskListener {
 			startSpinner();
 
 			HashMap<String, String> newEventData = new HashMap<String, String>();
-			newEventData.put("codSofer", UserInfo.getInstance().getCod());
+			newEventData.put("codSofer", UserInfo.getInstance().getId());
 			newEventData.put("document", InfoStrings.getNrBorderou(context));
 			newEventData.put("client", InfoStrings.getCurentClient(context));
 			newEventData.put("codAdresa", InfoStrings.getCurentClientAddr(context));
@@ -530,13 +524,12 @@ public class LivrareView implements AsyncTaskListener {
 	private void displayArticoleData(String articoleData) {
 
 		HandleJSONData objListArticole = new HandleJSONData(context, articoleData);
-		ArrayList<BeanArticoleFactura> articoleArray = objListArticole.decodeJSONArticoleFactura();
+		ArrayList<ArticoleFactura> articoleArray = objListArticole.decodeJSONArticoleFactura();
 
 		if (articoleArray.size() > 0) {
 			arrayListArtLivr.clear();
 
 			boolean isDescarcat = false, isIncarcat = false;
-
 
 			HashMap<String, String> temp = null;
 
@@ -551,7 +544,6 @@ public class LivrareView implements AsyncTaskListener {
 
 			for (int i = 0; i < articoleArray.size(); i++) {
 
-				
 				valMasa = 0;
 
 				if (articoleArray.get(i).getTipOperatiune().equals("descarcare")) {

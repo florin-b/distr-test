@@ -1,6 +1,6 @@
-package com.distributieTest.model;
+package com.distributieTest.beans;
 
-public class BeanArticoleFactura {
+public class ArticoleFactura {
 
 	private String nume;
 	private String cantitate;
@@ -10,7 +10,7 @@ public class BeanArticoleFactura {
 	private String greutate;
 	private String umGreutate;
 
-	public BeanArticoleFactura() {
+	public ArticoleFactura() {
 
 	}
 

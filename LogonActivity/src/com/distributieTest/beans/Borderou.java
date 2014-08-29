@@ -1,13 +1,13 @@
-package com.distributieTest.model;
+package com.distributieTest.beans;
 
-public class BeanBorderou {
+public class Borderou {
 
 	private String numarBorderou;
 	private String dataEmiterii;
 	private String evenimentBorderou;
 	private String tipBorderou;
 
-	public BeanBorderou() {
+	public Borderou() {
 
 	}
 

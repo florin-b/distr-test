@@ -1,6 +1,6 @@
-package com.distributieTest.model;
+package com.distributieTest.beans;
 
-public class BeanFacturiBorderou {
+public class Factura {
 
 	private String codClient;
 	private String numeClient;
@@ -18,7 +18,7 @@ public class BeanFacturiBorderou {
 	
 	private String dataStartCursa;
 
-	public BeanFacturiBorderou() {
+	public Factura() {
 	}
 
 	public String getCodClient() {

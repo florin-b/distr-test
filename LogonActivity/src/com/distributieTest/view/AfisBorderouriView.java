@@ -13,11 +13,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.distributieTest.beans.Borderou;
+import com.distributieTest.beans.Factura;
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.listeners.CustomSpinnerListener;
 import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanBorderou;
-import com.distributieTest.model.BeanFacturiBorderou;
 import com.distributieTest.model.FacturiBorderou;
 import com.distributieTest.model.HandleJSONData;
 import com.distributieTest.model.InfoStrings;
@@ -117,7 +117,7 @@ public class AfisBorderouriView implements AsyncTaskListener, CustomSpinnerListe
 
 			HashMap<String, String> params = new HashMap<String, String>();
 
-			params.put("codSofer", UserInfo.getInstance().getCod());
+			params.put("codSofer", UserInfo.getInstance().getId());
 			params.put("interval", intervalAfisare);
 			params.put("tip", "t");
 
@@ -132,7 +132,7 @@ public class AfisBorderouriView implements AsyncTaskListener, CustomSpinnerListe
 	private void populateListBorderouri(String borderouri) {
 
 		HandleJSONData objListBorderouri = new HandleJSONData(context, borderouri);
-		ArrayList<BeanBorderou> borderouriArray = objListBorderouri.decodeJSONBorderouri();
+		ArrayList<Borderou> borderouriArray = objListBorderouri.decodeJSONBorderouri();
 
 		listBorderouri.clear();
 
@@ -190,7 +190,7 @@ public class AfisBorderouriView implements AsyncTaskListener, CustomSpinnerListe
 		try {
 
 			HandleJSONData objListFacturi = new HandleJSONData(context, eventsData);
-			ArrayList<BeanFacturiBorderou> facturiArray = objListFacturi.decodeJSONFacturiBorderou();
+			ArrayList<Factura> facturiArray = objListFacturi.decodeJSONFacturiBorderou();
 
 			textStartBorderou.setVisibility(View.GONE);
 

@@ -1,6 +1,6 @@
-package com.distributieTest.model;
+package com.distributieTest.beans;
 
-public class BeanEvenimentBorderou {
+public class EvenimentBorderou {
 
 	private String numeClient;
 	private String codClient;
@@ -12,7 +12,7 @@ public class BeanEvenimentBorderou {
 	private String kmSosireClient;
 	private String oraPlecare;
 
-	public BeanEvenimentBorderou() {
+	public EvenimentBorderou() {
 
 	}
 

@@ -1,12 +1,12 @@
-package com.distributieTest.model;
+package com.distributieTest.beans;
 
-public class BeanEveniment {
+public class Eveniment {
 	private String eveniment;
 	private String data;
 	private String ora;
 	private String distantaKM;
 
-	public BeanEveniment() {
+	public Eveniment() {
 
 	}
 

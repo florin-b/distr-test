@@ -1,4 +1,4 @@
-package com.distributieTest.model;
+package com.distributieTest.beans;
 
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -7,7 +7,7 @@ import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
 
 @SuppressWarnings("serial")
-public class BeanNewEvent implements Serializable, KvmSerializable {
+public class NewEvent implements Serializable, KvmSerializable {
 
 	private String codSofer;
 	private String document;
@@ -16,7 +16,7 @@ public class BeanNewEvent implements Serializable, KvmSerializable {
 	private String eveniment;
 	private String truckData;
 
-	public BeanNewEvent() {
+	public NewEvent() {
 
 	}
 

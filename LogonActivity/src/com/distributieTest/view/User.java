@@ -43,10 +43,10 @@ public class User extends Activity {
 			textFilialaSofer.setText(UserInfo.getInstance().getFiliala());
 
 			textCodSofer = (TextView) findViewById(R.id.textCodSofer);
-			textCodSofer.setText(UserInfo.getInstance().getCod());
+			textCodSofer.setText(UserInfo.getInstance().getId());
 
 			textNrAuto = (TextView) findViewById(R.id.textNrAuto);
-			textNrAuto.setText(UserInfo.getInstance().getNrAuto());
+			textNrAuto.setText("");
 
 		} catch (Exception ex) {
 			Toast.makeText(User.this, ex.toString(), Toast.LENGTH_SHORT).show();

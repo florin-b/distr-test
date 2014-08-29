@@ -6,6 +6,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.distributieTest.beans.ArticoleFactura;
+import com.distributieTest.beans.Borderou;
+import com.distributieTest.beans.Eveniment;
+import com.distributieTest.beans.EvenimentBorderou;
+import com.distributieTest.beans.Factura;
+import com.distributieTest.beans.InitStatus;
+
 import android.content.Context;
 import android.widget.Toast;
 
@@ -28,11 +35,11 @@ public class HandleJSONData {
 		this.JSONString = JSONString;
 	}
 
-	public ArrayList<BeanBorderou> decodeJSONBorderouri() {
+	public ArrayList<Borderou> decodeJSONBorderouri() {
 
-		BeanBorderou unBorderou = null;
+		Borderou unBorderou = null;
 
-		ArrayList<BeanBorderou> objectsList = new ArrayList<BeanBorderou>();
+		ArrayList<Borderou> objectsList = new ArrayList<Borderou>();
 
 		try {
 			jsonObject = new JSONArray(JSONString);
@@ -40,7 +47,7 @@ public class HandleJSONData {
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject borderouObject = jsonObject.getJSONObject(i);
 
-				unBorderou = new BeanBorderou();
+				unBorderou = new Borderou();
 				unBorderou.setNumarBorderou(borderouObject.getString("numarBorderou"));
 				unBorderou.setDataEmiterii(borderouObject.getString("dataEmiterii"));
 				unBorderou.setEvenimentBorderou(borderouObject.getString("evenimentBorderou"));
@@ -56,11 +63,11 @@ public class HandleJSONData {
 		return objectsList;
 	}
 
-	public ArrayList<BeanFacturiBorderou> decodeJSONFacturiBorderou() {
+	public ArrayList<Factura> decodeJSONFacturiBorderou() {
 
-		BeanFacturiBorderou oFactura = null;
+		Factura oFactura = null;
 
-		ArrayList<BeanFacturiBorderou> objectsList = new ArrayList<BeanFacturiBorderou>();
+		ArrayList<Factura> objectsList = new ArrayList<Factura>();
 
 		try {
 			jsonObject = new JSONArray(JSONString);
@@ -68,7 +75,7 @@ public class HandleJSONData {
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject facturaObject = jsonObject.getJSONObject(i);
 
-				oFactura = new BeanFacturiBorderou();
+				oFactura = new Factura();
 
 				oFactura.setCodFurnizor(facturaObject.getString("codFurnizor"));
 				oFactura.setNumeFurnizor(facturaObject.getString("numeFurnizor"));
@@ -97,9 +104,9 @@ public class HandleJSONData {
 		return objectsList;
 	}
 
-	public ArrayList<BeanEvenimentBorderou> decodeJSONEvenimentBorderou() {
-		BeanEvenimentBorderou eveniment = null;
-		ArrayList<BeanEvenimentBorderou> objectList = new ArrayList<BeanEvenimentBorderou>();
+	public ArrayList<EvenimentBorderou> decodeJSONEvenimentBorderou() {
+		EvenimentBorderou eveniment = null;
+		ArrayList<EvenimentBorderou> objectList = new ArrayList<EvenimentBorderou>();
 
 		try {
 			jsonObject = new JSONArray(JSONString);
@@ -107,7 +114,7 @@ public class HandleJSONData {
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject evenimentObject = jsonObject.getJSONObject(i);
 
-				eveniment = new BeanEvenimentBorderou();
+				eveniment = new EvenimentBorderou();
 
 				eveniment.setNumeClient(evenimentObject.getString("numeClient"));
 				eveniment.setCodClient(evenimentObject.getString("codClient"));
@@ -131,9 +138,9 @@ public class HandleJSONData {
 
 	}
 
-	public ArrayList<BeanEveniment> decodeJSONEveniment() {
-		BeanEveniment eveniment = null;
-		ArrayList<BeanEveniment> objectList = new ArrayList<BeanEveniment>();
+	public ArrayList<Eveniment> decodeJSONEveniment() {
+		Eveniment eveniment = null;
+		ArrayList<Eveniment> objectList = new ArrayList<Eveniment>();
 
 		try {
 			jsonObject = new JSONArray(JSONString);
@@ -141,7 +148,7 @@ public class HandleJSONData {
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject evenimentObject = jsonObject.getJSONObject(i);
 
-				eveniment = new BeanEveniment();
+				eveniment = new Eveniment();
 
 				eveniment.setEveniment(evenimentObject.getString("eveniment"));
 				eveniment.setData(evenimentObject.getString("data"));
@@ -160,9 +167,9 @@ public class HandleJSONData {
 
 	}
 
-	public ArrayList<BeanArticoleFactura> decodeJSONArticoleFactura() {
-		BeanArticoleFactura articol = null;
-		ArrayList<BeanArticoleFactura> objectList = new ArrayList<BeanArticoleFactura>();
+	public ArrayList<ArticoleFactura> decodeJSONArticoleFactura() {
+		ArticoleFactura articol = null;
+		ArrayList<ArticoleFactura> objectList = new ArrayList<ArticoleFactura>();
 
 		try {
 			jsonObject = new JSONArray(JSONString);
@@ -170,7 +177,7 @@ public class HandleJSONData {
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject articolObject = jsonObject.getJSONObject(i);
 
-				articol = new BeanArticoleFactura();
+				articol = new ArticoleFactura();
 
 				articol.setNume(articolObject.getString("nume"));
 				articol.setCantitate(articolObject.getString("cantitate"));
@@ -189,6 +196,44 @@ public class HandleJSONData {
 		}
 
 		return objectList;
+
+	}
+
+	public void decodeLogonInfo() {
+
+		UserInfo userInfo = UserInfo.getInstance();
+		try {
+
+			JSONObject jsonObject = new JSONObject(JSONString);
+
+			userInfo.setLogonStatus(jsonObject.get("status").toString());
+			userInfo.setDepartament(jsonObject.get("departament").toString());
+			userInfo.setFiliala(jsonObject.get("filiala").toString());
+			userInfo.setTipAcces(jsonObject.get("tipAcces").toString());
+
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < 8 - jsonObject.get("id").toString().length(); i++) {
+				sb.append('0');
+			}
+			sb.append(jsonObject.get("id"));
+
+			userInfo.setId(sb.toString());
+			userInfo.setNume(jsonObject.get("nume").toString());
+			userInfo.setUnitLog(jsonObject.get("filiala").toString());
+
+			InitStatus initStatus = InitStatus.getInstance();
+
+			if (!jsonObject.get("initStatus").equals(null)) {
+				JSONObject jsonStatus = new JSONObject(jsonObject.get("initStatus").toString());
+				initStatus.setClient(jsonStatus.get("client").toString());
+				initStatus.setDocument(jsonStatus.get("document").toString());
+				initStatus.setEveniment(jsonStatus.get("eveniment").toString());
+			}
+
+		} catch (JSONException e) {
+
+			e.printStackTrace();
+		}
 
 	}
 

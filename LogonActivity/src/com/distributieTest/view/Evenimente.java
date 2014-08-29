@@ -28,11 +28,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.distributieTest.beans.Borderou;
+import com.distributieTest.beans.Eveniment;
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.listeners.CustomSpinnerListener;
 import com.distributieTest.model.AsyncTaskWSCall;
-import com.distributieTest.model.BeanBorderou;
-import com.distributieTest.model.BeanEveniment;
 import com.distributieTest.model.EncodeJSONData;
 import com.distributieTest.model.HandleJSONData;
 import com.distributieTest.model.InfoStrings;
@@ -255,7 +255,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			String localStrDocNr = InfoStrings.getNrBorderou(Evenimente.this);
 
 			HashMap<String, String> newEventData = new HashMap<String, String>();
-			newEventData.put("codSofer", UserInfo.getInstance().getCod());
+			newEventData.put("codSofer", UserInfo.getInstance().getId());
 			newEventData.put("document", localStrDocNr);
 			newEventData.put("client", localStrDocNr);
 			newEventData.put("codAdresa", " ");
@@ -283,7 +283,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			startSpinner();
 
 			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("codSofer", UserInfo.getInstance().getCod());
+			params.put("codSofer", UserInfo.getInstance().getId());
 			params.put("tip", "d");
 			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getBorderouri", params);
 			call.getCallResults();
@@ -296,7 +296,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 	private void populateListBorderouri(String borderouri) {
 
 		HandleJSONData objListBorderouri = new HandleJSONData(this, borderouri);
-		ArrayList<BeanBorderou> borderouriArray = objListBorderouri.decodeJSONBorderouri();
+		ArrayList<Borderou> borderouriArray = objListBorderouri.decodeJSONBorderouri();
 
 		if (borderouriArray.size() > 0) {
 
@@ -398,7 +398,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 		try {
 
 			HandleJSONData objListEvenimente = new HandleJSONData(this, eventsData);
-			ArrayList<BeanEveniment> evenimenteArray = objListEvenimente.decodeJSONEveniment();
+			ArrayList<Eveniment> evenimenteArray = objListEvenimente.decodeJSONEveniment();
 
 			if (evenimenteArray.size() > 0) {
 

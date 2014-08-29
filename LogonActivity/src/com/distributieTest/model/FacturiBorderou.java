@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import android.content.Context;
 
+import com.distributieTest.beans.Factura;
 import com.distributieTest.view.CustomAdapter;
 import com.distributieTest.view.R;
 
@@ -19,7 +20,7 @@ public class FacturiBorderou {
 		this.context = context;
 	}
 
-	public CustomAdapter getFacturiBorderouAdapter(ArrayList<BeanFacturiBorderou> facturiArray, String tipDocument) {
+	public CustomAdapter getFacturiBorderouAdapter(ArrayList<Factura> facturiArray, String tipDocument) {
 
 		CustomAdapter adapterFacturi = null;
 		arrayListFacturi = new ArrayList<HashMap<String, String>>();
@@ -203,7 +204,7 @@ public class FacturiBorderou {
 
 	}
 
-	private boolean isClientSelected(ArrayList<BeanFacturiBorderou> facturiArray, int pos) {
+	private boolean isClientSelected(ArrayList<Factura> facturiArray, int pos) {
 		return InfoStrings.getCurentClient(context).equals(facturiArray.get(pos).getCodClient())
 				&& InfoStrings.getCurentClientAddr(context).equals(facturiArray.get(pos).getCodAdresaClient());
 	}

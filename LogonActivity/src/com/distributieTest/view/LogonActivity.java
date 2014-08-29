@@ -33,8 +33,10 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
+import com.distributieTest.beans.InitStatus;
 import com.distributieTest.listeners.AsyncTaskListener;
 import com.distributieTest.model.AsyncTaskWSCall;
+import com.distributieTest.model.HandleJSONData;
 import com.distributieTest.model.InfoStrings;
 import com.distributieTest.model.UserInfo;
 import com.distributieTest.model.Utils;
@@ -157,47 +159,38 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	}
 
 	public void validateLogin(String result) {
-		if (!result.equals("-1") && result.length() > 0) {
+
+		HandleJSONData objLogon = new HandleJSONData(this, result);
+		objLogon.decodeLogonInfo();
+
+		UserInfo userInfo = UserInfo.getInstance();
+
+		if (userInfo.getNume() != null) {
+
 			String[] token = result.split("#");
 
-			if (token[0].equals("0")) {
+			if (userInfo.getLogonStatus().equals("0")) {
 				InfoStrings.showCustomToast(this, "Cont inexistent!");
 
 			}
-			if (token[0].equals("1")) {
+			if (userInfo.getLogonStatus().equals("1")) {
 				InfoStrings.showCustomToast(this, "Cont blocat 60 de minute!");
 
 			}
-			if (token[0].equals("2")) {
+			if (userInfo.getLogonStatus().equals("2")) {
 				InfoStrings.showCustomToast(this, "Parola incorecta!");
 			}
-			if (token[0].equals("3")) {
+			if (userInfo.getLogonStatus().equals("3")) {
 
-				if (token[5].equals("37")) // sofer
+				if (userInfo.getTipAcces().equals("37")) // sofer
 				{
 
-					UserInfo uInfo = UserInfo.getInstance();
-
-					String tempAgCod = token[4].toString();
+					String tempAgCod = userInfo.getId();
 
 					if (tempAgCod.equalsIgnoreCase("-1")) {
 						Toast.makeText(getApplicationContext(), "Utilizator nedefinit!", Toast.LENGTH_SHORT).show();
 						return;
 					}
-
-					StringBuffer sb = new StringBuffer();
-
-					for (int i = 0; i < 8 - token[4].length(); i++) {
-						sb.append('0');
-					}
-
-					sb.append(token[4]);
-
-					tempAgCod = sb.toString();
-					uInfo.setNume(token[3]);
-					uInfo.setFiliala(token[2]);
-					uInfo.setCod(tempAgCod);
-					uInfo.setUnitLog(Utils.getFiliala(token[2].toString()));
 
 					try {
 						startSpinner();
@@ -221,6 +214,9 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 			InfoStrings.showCustomToast(this, "Autentificare esuata!");
 
 		}
+
+		stopSpinner();
+		jogView.setEnabled(true);
 
 	}
 
@@ -454,26 +450,36 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 
 	private void redirectView() {
 
-		if (!InfoStrings.getCurentClient(getApplicationContext()).equals("0")) {
-			Intent nextScreen = new Intent(getApplicationContext(), Livrare.class);
-			startActivity(nextScreen);
-			finish();
-		}
+		InitStatus initStatus = InitStatus.getInstance();
 
-		if (!InfoStrings.getNrBorderou(getApplicationContext()).equals("0")
-				&& InfoStrings.getCurentClient(getApplicationContext()).equals("0")) {
-			Intent nextScreen = new Intent(getApplicationContext(), Evenimente.class);
-			startActivity(nextScreen);
-			finish();
-		}
-
-		if (InfoStrings.getNrBorderou(getApplicationContext()).equals("0")
-				&& InfoStrings.getCurentClient(getApplicationContext()).equals("0")) {
+		if (noActivity(initStatus)) {
 			Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 			startActivity(nextScreen);
 			finish();
+		} else {
+			if (activeDocument(initStatus)) {
+				Intent nextScreen = new Intent(getApplicationContext(), Evenimente.class);
+				startActivity(nextScreen);
+				finish();
+			} else if (activeClient(initStatus)) {
+				Intent nextScreen = new Intent(getApplicationContext(), Livrare.class);
+				startActivity(nextScreen);
+				finish();
+			}
 		}
 
+	}
+
+	boolean noActivity(InitStatus initStatus) {
+		return initStatus.getClient() == null;
+	}
+
+	boolean activeDocument(InitStatus initStatus) {
+		return initStatus.getDocument().equals(initStatus.getClient());
+	}
+
+	boolean activeClient(InitStatus initStatus) {
+		return !initStatus.getDocument().equals(initStatus.getClient());
 	}
 
 	private void startSpinner() {

@@ -4,13 +4,17 @@
  */
 package com.distributieTest.model;
 
+import com.distributieTest.beans.InitStatus;
+
 public class UserInfo {
 
-	private String nume = "";
-	private String filiala = "";
-	private String cod = "";
-	private String unitLog = "";
-	private String nrAuto = "";
+	private String nume;
+	private String filiala;
+	private String id;
+	private String unitLog;
+	private String status;
+	private String departament;
+	private String tipAcces;
 
 	private static UserInfo instance = new UserInfo();
 
@@ -37,12 +41,12 @@ public class UserInfo {
 		this.filiala = filiala;
 	}
 
-	public String getCod() {
-		return cod;
+	public String getId() {
+		return id;
 	}
 
-	public void setCod(String cod) {
-		this.cod = cod;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getUnitLog() {
@@ -53,12 +57,28 @@ public class UserInfo {
 		this.unitLog = unitLog;
 	}
 
-	public String getNrAuto() {
-		return nrAuto;
+	public String getLogonStatus() {
+		return status;
 	}
 
-	public void setNrAuto(String nrAuto) {
-		this.nrAuto = nrAuto;
+	public void setLogonStatus(String logonStatus) {
+		this.status = logonStatus;
+	}
+
+	public String getDepartament() {
+		return departament;
+	}
+
+	public void setDepartament(String departament) {
+		this.departament = departament;
+	}
+
+	public String getTipAcces() {
+		return tipAcces;
+	}
+
+	public void setTipAcces(String tipAcces) {
+		this.tipAcces = tipAcces;
 	}
 
 }
