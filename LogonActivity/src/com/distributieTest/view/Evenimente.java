@@ -27,6 +27,9 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 import com.distributieTest.beans.Borderou;
 import com.distributieTest.beans.Eveniment;
@@ -41,21 +44,63 @@ import com.distributieTest.model.Utils;
 
 public class Evenimente extends Activity implements AsyncTaskListener, CustomSpinnerListener {
 
-	Button eventButton, showDetBtn;
+	@InjectView(R.id.saveEvent)
+	Button eventButton;
 
+	@InjectView(R.id.showDetBordBtn)
+	Button showDetBtn;
+
+	@InjectView(R.id.progress_bar_event)
 	ProgressBar progressBarEvent;
+
+	@InjectView(R.id.spinnerBorderouri)
+	Spinner spinnerBorderouri;
+
+	@InjectView(R.id.pw_spinner)
+	ProgressWheel pw;
+
+	@InjectView(R.id.layoutOutEvent)
+	LinearLayout layoutEventOut;
+
+	@InjectView(R.id.layoutInEvent)
+	LinearLayout layoutEventIn;
+
+	@InjectView(R.id.layoutTotalTrip)
+	LinearLayout layoutTotalTrip;
+
+	@InjectView(R.id.layoutDetBtn)
+	LinearLayout layoutDetButton;
+
+	@InjectView(R.id.textDateEventOut)
+	TextView textDateEventOut;
+
+	@InjectView(R.id.textTimeEventOut)
+	TextView textTimeEventOut;
+
+	@InjectView(R.id.textKmEventOut)
+	TextView textKmEventOut;
+
+	@InjectView(R.id.textDateEventIn)
+	TextView textDateEventIn;
+
+	@InjectView(R.id.textTimeEventIn)
+	TextView textTimeEventIn;
+
+	@InjectView(R.id.textKmEventIn)
+	TextView textKmEventIn;
+
+	@InjectView(R.id.textTripTime)
+	TextView textTripTime;
+
+	@InjectView(R.id.textTripDistance)
+	TextView textTripDistance;
+
 	private Timer myEventTimer;
 	private int progressVal = 0;
 	private Handler eventHandler = new Handler();
 
 	private BorderouriAdapter adapterBorderouri;
 	private static ArrayList<HashMap<String, String>> listBorderouri = new ArrayList<HashMap<String, String>>();
-	Spinner spinnerBorderouri;
-
-	ProgressWheel pw;
-	LinearLayout layoutEventOut, layoutEventIn, layoutTotalTrip, layoutDetButton;
-	TextView textDateEventOut, textTimeEventOut, textKmEventOut, textDateEventIn, textTimeEventIn, textKmEventIn,
-			textTripTime, textTripDistance;
 
 	CustomSpinnerClass spinnerClass = new CustomSpinnerClass();
 
@@ -65,6 +110,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 		setTheme(R.style.LRTheme);
 		setContentView(R.layout.evenimente);
+		ButterKnife.inject(this);
 
 		InitialUISetup();
 
@@ -78,54 +124,32 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			actionBar.setTitle("Borderouri");
 			actionBar.setDisplayHomeAsUpEnabled(true);
 
-			layoutEventOut = (LinearLayout) findViewById(R.id.layoutOutEvent);
 			layoutEventOut.setVisibility(View.INVISIBLE);
-
-			layoutEventIn = (LinearLayout) findViewById(R.id.layoutInEvent);
 			layoutEventIn.setVisibility(View.INVISIBLE);
 
-			progressBarEvent = (ProgressBar) findViewById(R.id.progress_bar_event);
 			progressBarEvent.setVisibility(View.INVISIBLE);
 
-			textDateEventOut = (TextView) findViewById(R.id.textDateEventOut);
 			textDateEventOut.setText("");
-			textTimeEventOut = (TextView) findViewById(R.id.textTimeEventOut);
 			textTimeEventOut.setText("");
-			textKmEventOut = (TextView) findViewById(R.id.textKmEventOut);
 			textKmEventOut.setText("");
-
-			textDateEventIn = (TextView) findViewById(R.id.textDateEventIn);
 			textDateEventIn.setText("");
-			textTimeEventIn = (TextView) findViewById(R.id.textTimeEventIn);
 			textTimeEventIn.setText("");
-			textKmEventIn = (TextView) findViewById(R.id.textKmEventIn);
 			textKmEventIn.setText("");
-
-			layoutTotalTrip = (LinearLayout) findViewById(R.id.layoutTotalTrip);
 			layoutTotalTrip.setVisibility(View.INVISIBLE);
-
-			textTripTime = (TextView) findViewById(R.id.textTripTime);
 			textTripTime.setText("");
-
-			textTripDistance = (TextView) findViewById(R.id.textTripDistance);
 			textTripDistance.setText("");
 
-			eventButton = (Button) findViewById(R.id.saveEvent);
 			eventButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.out1, 0, 0, 0);
 			eventButton.setText("\t\tStart borderou");
 			eventButton.setVisibility(View.INVISIBLE);
 			eventButton.setOnTouchListener(new myEventBtnOnTouchListener());
 
-			layoutDetButton = (LinearLayout) findViewById(R.id.layoutDetBtn);
 			layoutDetButton.setVisibility(View.GONE);
-			showDetBtn = (Button) findViewById(R.id.showDetBordBtn);
-			showDetBtn.setVisibility(View.VISIBLE);
-			showDetBtn.setOnClickListener(new myDetBtnOnClickListener());
 
-			pw = (ProgressWheel) findViewById(R.id.pw_spinner);
+			showDetBtn.setVisibility(View.VISIBLE);
+
 			pw.setVisibility(View.INVISIBLE);
 
-			spinnerBorderouri = (Spinner) findViewById(R.id.spinnerBorderouri);
 			adapterBorderouri = new BorderouriAdapter(this, listBorderouri, R.layout.custom_row_list_borderouri,
 					new String[] { "nrCrt", "codBorderou", "dataBorderou", "tipBorderou", "eveniment" }, new int[] {
 							R.id.textNrCrt, R.id.textCodBorderou, R.id.textDataBorderou, R.id.textTipBorderou,
@@ -213,15 +237,12 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 	}
 
-	class myDetBtnOnClickListener implements Button.OnClickListener {
-		public void onClick(View arg0) {
-			Intent nextScreen = new Intent(Evenimente.this, Livrare.class);
-			startActivity(nextScreen);
+	@OnClick(R.id.showDetBordBtn)
+	public void myDetBtnOnClickListener() {
+		Intent nextScreen = new Intent(Evenimente.this, Livrare.class);
+		startActivity(nextScreen);
 
-			finish();
-
-		}
-
+		finish();
 	}
 
 	class UpdateProgress extends TimerTask {
@@ -285,6 +306,8 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			HashMap<String, String> params = new HashMap<String, String>();
 			params.put("codSofer", UserInfo.getInstance().getId());
 			params.put("tip", "d");
+			
+			
 			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getBorderouri", params);
 			call.getCallResults();
 

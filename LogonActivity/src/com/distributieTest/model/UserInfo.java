@@ -4,8 +4,6 @@
  */
 package com.distributieTest.model;
 
-import com.distributieTest.beans.InitStatus;
-
 public class UserInfo {
 
 	private String nume;

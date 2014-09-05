@@ -14,5 +14,12 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="commons-net-3.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="ksoap2-android-assembly-2.6.0-jar-with-dependencies.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/butterknife-5.1.2.jar"/>
+	<classpathentry kind="src" path=".apt_generated">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="libs/dagger-1.2.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

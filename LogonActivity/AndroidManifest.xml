@@ -46,7 +46,7 @@
             android:screenOrientation="sensorLandscape" >
         </activity>
         <activity
-            android:name="Livrare"
+            android:name=".Livrare"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>
