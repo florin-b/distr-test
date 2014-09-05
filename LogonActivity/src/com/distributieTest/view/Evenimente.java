@@ -121,7 +121,7 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 		try {
 
 			ActionBar actionBar = getActionBar();
-			actionBar.setTitle("Borderouri");
+			actionBar.setTitle("Borderouri ");
 			actionBar.setDisplayHomeAsUpEnabled(true);
 
 			layoutEventOut.setVisibility(View.INVISIBLE);
