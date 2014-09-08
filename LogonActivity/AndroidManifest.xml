@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.distributieTest.view"
+    package="com.example.distributie"
     android:sharedUserId="com.android"
     android:versionCode="10"
     android:versionName="1.0" >
@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.distributieTest.view.LogonActivity"
+            android:name="com.example.distributie.LogonActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,32 +31,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainMenu"
+            android:name="com.distributie.view.MainMenu"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>
         <activity
-            android:name=".User"
+            android:name="com.distributie.view.User"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>
         <activity
-            android:name=".Evenimente"
+            android:name="com.distributie.view.Evenimente"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>
         <activity
-            android:name=".Livrare"
+            android:name="com.distributie.view.Livrare"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>
         <activity
-            android:name=".AfisBorderouri"
+            android:name="com.distributie.view.AfisBorderouri"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>        
         <activity
-            android:name=".TestConnection"
+            android:name="com.distributie.view.TestConnection"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>        

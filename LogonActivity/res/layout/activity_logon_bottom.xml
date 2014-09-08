@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <com.distributieTest.view.ProgressWheel
+    <com.distributie.view.ProgressWheel
         android:id="@+id/pw_spinner"
         android:layout_width="80dp"
         android:layout_height="80dp"
