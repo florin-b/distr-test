@@ -11,47 +11,43 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Locale;
-
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.res.Configuration;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
 import com.distributie.beans.InitStatus;
 import com.distributie.listeners.AsyncTaskListener;
-import com.distributie.model.AsyncTaskWSCall;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.InfoStrings;
+import com.distributie.model.LogonImpl;
+import com.distributie.model.LogonListener;
 import com.distributie.model.UserInfo;
-import com.distributie.model.Utils;
 import com.distributie.view.Evenimente;
 import com.distributie.view.Livrare;
 import com.distributie.view.MainMenu;
 import com.distributie.view.ProgressWheel;
 import com.distributie.view.RotaryKnobView;
-import com.distributie.view.RotaryKnobView.RotaryKnobListener;
 
-public class LogonActivity extends Activity implements AsyncTaskListener {
+public class LogonActivity extends Activity implements LogonListener {
 
 	int val = 0;
-
-	private static final String METHOD_NAME = "userLogon";
 
 	ProgressBar progressBarWheel;
 	EditText txtUserName, txtPassword;
@@ -147,17 +143,12 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	public void performLoginThread() {
 		try {
 
-			HashMap<String, String> params = new HashMap<String, String>();
-
 			String userN = txtUserName.getText().toString().trim();
 			String passN = txtPassword.getText().toString().trim();
 
-			params.put("userId", userN);
-			params.put("userPass", passN);
-			params.put("ipAdr", "-1");
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, METHOD_NAME, params);
-			call.getCallResults();
+			LogonImpl logon = new LogonImpl(this);
+			logon.setLogonListener(this);
+			logon.performLogon(userN, passN);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
@@ -500,10 +491,8 @@ public class LogonActivity extends Activity implements AsyncTaskListener {
 	}
 
 	@Override
-	public void onTaskComplete(String methodName, String result) {
-		if (methodName.equals(METHOD_NAME)) {
-			validateLogin(result);
-		}
+	public void logonComplete(String result) {
+		validateLogin(result);
 
 	}
 

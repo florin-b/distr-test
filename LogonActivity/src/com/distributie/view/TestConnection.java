@@ -9,11 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import com.distributie.listeners.AsyncTaskListener;
-import com.distributie.model.AsyncTaskWSCall;
-import com.distributie.model.InfoStrings;
-import com.example.distributie.R;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -29,10 +24,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TestConnection extends Activity implements AsyncTaskListener {
+import com.distributie.listeners.AsyncTaskListener;
+import com.distributie.listeners.FmsTestListener;
+import com.distributie.model.AsyncTaskWSCall;
+import com.distributie.model.FmsDataTestImpl;
+import com.distributie.model.InfoStrings;
+import com.example.distributie.R;
 
-	private TextView textData, textKilometraj, textNivelCombustibil,
-			textLocatie;
+public class TestConnection extends Activity implements FmsTestListener {
+
+	private TextView textData, textKilometraj, textNivelCombustibil, textLocatie;
 	private String strBTMacAddr;
 	private ProgressWheel pw;
 
@@ -57,8 +58,7 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 		strBTMacAddr = getBTMacAddr();
 
 		if (strBTMacAddr.equals("-1")) {
-			Toast.makeText(getApplicationContext(),
-					"Dispozitiv FMS inexistent.", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "Dispozitiv FMS inexistent.", Toast.LENGTH_LONG).show();
 		} else {
 			getFmsData();
 		}
@@ -72,14 +72,13 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 			BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
 
 			if (btAdapter != null) {
-				Set<BluetoothDevice> pairedDevices = btAdapter
-						.getBondedDevices();
+				Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
 
 				if (pairedDevices.size() > 0) {
 
 					for (BluetoothDevice device : pairedDevices) {
 
-						if (device.getName().contains("INVENTURE")) {
+						if (device.getName().toLowerCase().contains("inv")) {
 							macAddr = device.getAddress();
 						}
 
@@ -87,8 +86,7 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 				}
 			}
 		} catch (Exception ex) {
-			Toast.makeText(getApplicationContext(), ex.toString(),
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), ex.toString(), Toast.LENGTH_SHORT).show();
 			macAddr = "-1";
 		}
 
@@ -101,20 +99,31 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 
 	}
 
+	private void stopSpinner() {
+		pw.setVisibility(View.INVISIBLE);
+		pw.stopSpinning();
+
+	}
+
 	private void getFmsData() {
 		try {
 
 			startSpinner();
 
-			HashMap<String, String> params = new HashMap<String, String>();
+			FmsDataTestImpl fmsTest = new FmsDataTestImpl(this);
+			fmsTest.setFmsTestListener(this);
+			fmsTest.getFmsData(getBTMacAddr());
 
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getFmsTestData",
-					params);
-			call.getCallResults();
+			/*
+			 * HashMap<String, String> params = new HashMap<String, String>();
+			 * params.put("fmsMAC", getBTMacAddr());
+			 * 
+			 * AsyncTaskWSCall call = new AsyncTaskWSCall(this,
+			 * "getFmsTestData", params); call.getCallResults1();
+			 */
 
 		} catch (Exception e) {
-			Toast.makeText(getApplicationContext(), e.toString(),
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -131,20 +140,18 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 				longit = Double.valueOf(tokCoord[1]);
 			}
 
-			textData.setText(fmsToken[0] + " " + fmsToken[1].substring(0, 2)
-					+ ":" + fmsToken[1].substring(2, 4) + ":"
+			textData.setText(fmsToken[0] + " " + fmsToken[1].substring(0, 2) + ":" + fmsToken[1].substring(2, 4) + ":"
 					+ fmsToken[1].substring(4, 6));
 
-			textKilometraj.setText(InfoStrings.getKMFromFMS(fmsToken[3])
-					+ " km");
-			textNivelCombustibil.setText(InfoStrings
-					.getFuelLevelFromFMS(fmsToken[3]) + "%");
+			textKilometraj.setText(InfoStrings.getKMFromFMS(fmsToken[3]) + " km");
+			textNivelCombustibil.setText(InfoStrings.getFuelLevelFromFMS(fmsToken[3]) + "%");
 			textLocatie.setText(getAddress(latid, longit));
 
 		} else {
-			Toast.makeText(TestConnection.this, "Nu exista informatii.",
-					Toast.LENGTH_LONG).show();
+			Toast.makeText(TestConnection.this, "Nu exista informatii.", Toast.LENGTH_LONG).show();
 		}
+
+		stopSpinner();
 
 	}
 
@@ -152,20 +159,17 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 		StringBuilder result = new StringBuilder();
 		try {
 			Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-			List<Address> addresses = geocoder.getFromLocation(latitude,
-					longitude, 1);
+			List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 			if (addresses.size() > 0) {
 				Address address = addresses.get(0);
 				if (!addresses.get(0).getAddressLine(0).equals("")) {
-					result.append(addresses.get(0).getAddressLine(0)).append(
-							", ");
+					result.append(addresses.get(0).getAddressLine(0)).append(", ");
 				}
 				result.append(address.getLocality()).append("");
 
 			}
 		} catch (Exception e) {
-			Toast.makeText(TestConnection.this, e.toString(), Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(TestConnection.this, e.toString(), Toast.LENGTH_LONG).show();
 		}
 
 		if (result.length() == 0)
@@ -185,8 +189,7 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 			break;
 
 		case android.R.id.home:
-			Intent nextScreen = new Intent(getApplicationContext(),
-					MainMenu.class);
+			Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 			startActivity(nextScreen);
 			finish();
 
@@ -215,10 +218,8 @@ public class TestConnection extends Activity implements AsyncTaskListener {
 	}
 
 	@Override
-	public void onTaskComplete(String methodName, String result) {
-		if (methodName.equals("getFmsTestData")) {
-			populateFmsData(result);
-		}
+	public void testComplete(String result) {
+		populateFmsData(result);
 
 	}
 

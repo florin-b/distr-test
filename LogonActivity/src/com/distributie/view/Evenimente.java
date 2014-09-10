@@ -30,20 +30,20 @@ import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Eveniment;
-import com.distributie.listeners.AsyncTaskListener;
+import com.distributie.listeners.BorderouriDAOListener;
 import com.distributie.listeners.CustomSpinnerListener;
-import com.distributie.model.AsyncTaskWSCall;
-import com.distributie.model.EncodeJSONData;
+import com.distributie.listeners.OperatiiBorderouriListener;
+import com.distributie.model.BorderouriDAOImpl;
+import com.distributie.model.OperatiiBorderouriDAOImpl;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.InfoStrings;
 import com.distributie.model.UserInfo;
 import com.distributie.model.Utils;
 import com.example.distributie.R;
 
-public class Evenimente extends Activity implements AsyncTaskListener, CustomSpinnerListener {
+public class Evenimente extends Activity implements CustomSpinnerListener, BorderouriDAOListener, OperatiiBorderouriListener {
 
 	@InjectView(R.id.saveEvent)
 	Button eventButton;
@@ -284,14 +284,9 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			newEventData.put("eveniment", InfoStrings.getEveniment(Evenimente.this));
 			newEventData.put("truckData", getTruckServiceData());
 
-			EncodeJSONData jsonEvLivrare = new EncodeJSONData(this, newEventData);
-			String serializedData = jsonEvLivrare.encodeNewEventData();
-
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("serializedEvent", serializedData);
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "saveNewEvent", params);
-			call.getCallResults();
+			OperatiiBorderouriDAOImpl newEvent = new OperatiiBorderouriDAOImpl(this);
+			newEvent.setEventListener(this);
+			newEvent.saveNewEventBorderou(newEventData);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
@@ -304,12 +299,9 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 
 			startSpinner();
 
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("codSofer", UserInfo.getInstance().getId());
-			params.put("tip", "d");
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getBorderouri", params);
-			call.getCallResults();
+			BorderouriDAOImpl bord = new BorderouriDAOImpl(this);
+			bord.setBorderouEventListener(this);
+			bord.getBorderouri(UserInfo.getInstance().getId(), "d", "-1");
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
@@ -402,13 +394,9 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 		try {
 			startSpinner();
 
-			HashMap<String, String> params = new HashMap<String, String>();
-
-			params.put("nrDoc", InfoStrings.getNrBorderou(getApplicationContext()));
-			params.put("tipEv", "0");
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(this, "getDocEvents", params);
-			call.getCallResults();
+			OperatiiBorderouriDAOImpl eventsDAO = new OperatiiBorderouriDAOImpl(this);
+			eventsDAO.setEventListener(this);
+			eventsDAO.getDocEvents(InfoStrings.getNrBorderou(getApplicationContext()), "0");
 
 		} catch (Exception ex) {
 
@@ -539,10 +527,30 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 	}
 
 	@Override
-	public void onTaskComplete(String methodName, String result) {
-		if (methodName.equals("getBorderouri")) {
-			stopSpinner();
-			populateListBorderouri(result);
+	public void onSelectedSpinnerItem(int spinnerId, HashMap<String, String> map) {
+		if (spinnerId == R.id.spinnerBorderouri) {
+			InfoStrings.setNrBorderou(getApplicationContext(), map.get("codBorderou"));
+			InfoStrings.setEveniment(getApplicationContext(), map.get("eveniment"));
+			InfoStrings.setTipBorderou(getApplicationContext(), map.get("tipBorderou"));
+
+			performGetBorderouEvents();
+
+		}
+
+	}
+
+	@Override
+	public void loadComplete(String result, String methodName) {
+		stopSpinner();
+		populateListBorderouri(result);
+
+	}
+
+	@Override
+	public void eventComplete(String result, String methodName) {
+		stopSpinner();
+		if (methodName.equals("getDocEvents")) {
+			populateEventsList(result);
 		}
 
 		if (methodName.equals("saveNewEvent")) {
@@ -553,25 +561,6 @@ public class Evenimente extends Activity implements AsyncTaskListener, CustomSpi
 			if (InfoStrings.getEveniment(Evenimente.this).equals("S")) {
 				InfoStrings.setNrBorderou(Evenimente.this, "0");
 			}
-
-		}
-
-		if (methodName.equals("getDocEvents")) {
-			stopSpinner();
-			populateEventsList(result);
-		}
-
-	}
-
-	@Override
-	public void onSelectedSpinnerItem(int spinnerId, HashMap<String, String> map) {
-		if (spinnerId == R.id.spinnerBorderouri) {
-			InfoStrings.setNrBorderou(getApplicationContext(), map.get("codBorderou"));
-			InfoStrings.setEveniment(getApplicationContext(), map.get("eveniment"));
-			InfoStrings.setTipBorderou(getApplicationContext(), map.get("tipBorderou"));
-
-			performGetBorderouEvents();
-
 		}
 
 	}

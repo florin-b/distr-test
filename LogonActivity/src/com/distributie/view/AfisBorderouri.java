@@ -23,22 +23,19 @@ import butterknife.InjectView;
 
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Factura;
-import com.distributie.listeners.AsyncTaskListener;
+import com.distributie.listeners.BorderouriDAOListener;
 import com.distributie.listeners.CustomSpinnerListener;
-import com.distributie.model.AsyncTaskWSCall;
+import com.distributie.model.BorderouriDAOImpl;
 import com.distributie.model.FacturiBorderou;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.InfoStrings;
 import com.distributie.model.UserInfo;
 import com.example.distributie.R;
 
-
-
-public class AfisBorderouri extends Activity implements AsyncTaskListener, CustomSpinnerListener {
+public class AfisBorderouri extends Activity implements CustomSpinnerListener, BorderouriDAOListener {
 
 	private Dialog dialogSelInterval;
 	private String intervalAfisare = "0";
-	private AfisBorderouri afisBorderouriView;
 
 	private SimpleAdapter adapterBorderouri, adapterEvenimente;
 	private static ArrayList<HashMap<String, String>> listBorderouri = new ArrayList<HashMap<String, String>>();
@@ -158,17 +155,7 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 			spinnerSelInterval.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 				public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
-					if (0 == pos) {
-						intervalAfisare = "0";
-					}
-
-					if (1 == pos) {
-						intervalAfisare = "1";
-					}
-
-					if (2 == pos) {
-						intervalAfisare = "2";
-					}
+					intervalAfisare = String.valueOf(pos);
 
 				}
 
@@ -191,8 +178,7 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 			return true;
 
 		case android.R.id.home:
-
-			afisBorderouriView = null;
+			
 			Intent nextScreen = new Intent(this, MainMenu.class);
 			startActivity(nextScreen);
 			finish();
@@ -207,7 +193,7 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 	@Override
 	public void onBackPressed() {
 
-		afisBorderouriView = null;
+		
 		Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 		startActivity(nextScreen);
 		finish();
@@ -238,14 +224,9 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 			listViewEvenimente.setAdapter(adapterEvenimente);
 			listViewEvenimente.setVisibility(View.INVISIBLE);
 
-			HashMap<String, String> params = new HashMap<String, String>();
-
-			params.put("codSofer", UserInfo.getInstance().getId());
-			params.put("interval", intervalAfisare);
-			params.put("tip", "t");
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(context, (AsyncTaskListener) this, "getBorderouri", params);
-			call.getCallResults2();
+			BorderouriDAOImpl bord = new BorderouriDAOImpl(this);
+			bord.setBorderouEventListener(this);
+			bord.getBorderouri(UserInfo.getInstance().getId(), "t", intervalAfisare);
 
 		} catch (Exception e) {
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
@@ -294,14 +275,11 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 		try {
 			startSpinner();
 
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("nrBorderou", selectedBorderou);
-			params.put("tipBorderou", selectedTip);
-			AsyncTaskWSCall call = new AsyncTaskWSCall(context, (AsyncTaskListener) this, "getFacturiBorderou", params);
-			call.getCallResults2();
+			BorderouriDAOImpl borderouri = new BorderouriDAOImpl(this);
+			borderouri.setBorderouEventListener(this);
+			borderouri.getFacturiBorderou(selectedBorderou, selectedTip);
 
 		} catch (Exception ex) {
-
 			Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show();
 
 		}
@@ -345,20 +323,6 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 	}
 
 	@Override
-	public void onTaskComplete(String methodName, String result) {
-		if (methodName.equals("getBorderouri")) {
-			stopSpinner();
-			populateListBorderouri(result);
-		}
-
-		if (methodName.equals("getFacturiBorderou")) {
-			stopSpinner();
-			populateEventsList(result);
-		}
-
-	}
-
-	@Override
 	public void onSelectedSpinnerItem(int spinnerId, HashMap<String, String> map) {
 
 		if (spinnerId == R.id.spinnerBorderouri) {
@@ -368,4 +332,19 @@ public class AfisBorderouri extends Activity implements AsyncTaskListener, Custo
 		}
 
 	}
+
+	@Override
+	public void loadComplete(String result, String methodName) {
+		stopSpinner();
+
+		if (methodName.equals("getBorderouri")) {
+			populateListBorderouri(result);
+		}
+
+		if (methodName.equals("getFacturiBorderou")) {
+			populateEventsList(result);
+		}
+
+	}
+
 }

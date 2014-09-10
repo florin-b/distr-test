@@ -39,15 +39,18 @@ import butterknife.InjectView;
 import com.distributie.beans.ArticoleFactura;
 import com.distributie.beans.Factura;
 import com.distributie.listeners.AsyncTaskListener;
+import com.distributie.listeners.BorderouriDAOListener;
+import com.distributie.listeners.OperatiiBorderouriListener;
 import com.distributie.model.AsyncTaskWSCall;
-import com.distributie.model.EncodeJSONData;
+import com.distributie.model.BorderouriDAOImpl;
+import com.distributie.model.OperatiiBorderouriDAOImpl;
 import com.distributie.model.FacturiBorderou;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.InfoStrings;
 import com.distributie.model.UserInfo;
 import com.example.distributie.R;
 
-public class Livrare extends Activity implements AsyncTaskListener {
+public class Livrare extends Activity implements BorderouriDAOListener, OperatiiBorderouriListener {
 
 	@InjectView(R.id.saveEventClienti)
 	Button saveEventClienti;
@@ -240,12 +243,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 
 		startSpinner();
 
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("nrBorderou", InfoStrings.getNrBorderou(context));
-		params.put("tipBorderou", InfoStrings.getTipBorderou(context));
-		AsyncTaskWSCall call = new AsyncTaskWSCall(context, (AsyncTaskListener) Livrare.this, "getFacturiBorderou",
-				params);
-		call.getCallResults2();
+		BorderouriDAOImpl borderouri = new BorderouriDAOImpl(this);
+		borderouri.setBorderouEventListener(this);
+		borderouri.getFacturiBorderou(InfoStrings.getNrBorderou(context), InfoStrings.getTipBorderou(context));
 
 	}
 
@@ -552,15 +552,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 			newEventData.put("eveniment", InfoStrings.getEvenimentClient(context));
 			newEventData.put("truckData", getTruckServiceData());
 
-			EncodeJSONData jsonEvLivrare = new EncodeJSONData(context, newEventData);
-			String serializedData = jsonEvLivrare.encodeNewEventData();
-
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("serializedEvent", serializedData);
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(context, (AsyncTaskListener) Livrare.this, "saveNewEvent",
-					params);
-			call.getCallResults2();
+			OperatiiBorderouriDAOImpl bordStatus = new OperatiiBorderouriDAOImpl(this);
+			bordStatus.setEventListener(this);
+			bordStatus.saveNewEventClient(newEventData);
 
 		} catch (Exception e) {
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
@@ -582,14 +576,9 @@ public class Livrare extends Activity implements AsyncTaskListener {
 	private void performGetArticoleDocument() {
 		try {
 
-			HashMap<String, String> params = new HashMap<String, String>();
-
-			params.put("nrBorderou", InfoStrings.getNrBorderou(context));
-			params.put("codClient", InfoStrings.getCurentClient(context));
-
-			AsyncTaskWSCall call = new AsyncTaskWSCall(context, (AsyncTaskListener) Livrare.this,
-					"getArticoleBorderou", params);
-			call.getCallResults2();
+			BorderouriDAOImpl borderou = new BorderouriDAOImpl(this);
+			borderou.setBorderouEventListener(this);
+			borderou.getArticoleBorderou(InfoStrings.getNrBorderou(context), InfoStrings.getCurentClient(context));
 
 		} catch (Exception ex) {
 			Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
@@ -833,14 +822,24 @@ public class Livrare extends Activity implements AsyncTaskListener {
 	}
 
 	@Override
-	public void onTaskComplete(String methodName, String result) {
+	public void loadComplete(String result, String methodName) {
+		stopSpinner();
+
 		if (methodName.equals("getFacturiBorderou")) {
-			stopSpinner();
 			populateListFacturi(result);
 		}
 
+		if (methodName.equals("getArticoleBorderou")) {
+			displayArticoleData(result);
+		}
+
+	}
+
+	@Override
+	public void eventComplete(String result, String methodName) {
+		stopSpinner();
+
 		if (methodName.equals("saveNewEvent")) {
-			stopSpinner();
 
 			if (InfoStrings.getEvenimentClient(context).equals("S")) {
 				// plecare de la client, reset client curent
@@ -854,11 +853,6 @@ public class Livrare extends Activity implements AsyncTaskListener {
 			InfoStrings.setCurentClientName(context, selectedClientName);
 
 			performLoadFacturiBorderou();
-		}
-
-		if (methodName.equals("getArticoleBorderou")) {
-			displayArticoleData(result);
-			stopSpinner();
 		}
 
 	}
