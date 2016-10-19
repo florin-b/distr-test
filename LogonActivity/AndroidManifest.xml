@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.distributie"
-    android:sharedUserId="com.android"
+    package="com.distributie.view"
     android:versionCode="10"
     android:versionName="1.0" >
 
@@ -12,15 +11,26 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/testtube_48"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <uses-library android:name="com.google.android.maps" />
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAbV0msHeHVPtAe973EiKdDbexKjmBRlk4" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity
-            android:name="com.example.distributie.LogonActivity"
+            android:name="com.distributie.view.LogonActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:screenOrientation="sensorLandscape" >
@@ -41,7 +51,7 @@
             android:screenOrientation="sensorLandscape" >
         </activity>
         <activity
-            android:name="com.distributie.view.Evenimente"
+            android:name="com.distributie.view.BorderouriView"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>
@@ -57,6 +67,11 @@
         </activity>
         <activity
             android:name="com.distributie.view.TestConnection"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="sensorLandscape" >
+        </activity>
+        <activity
+            android:name="com.distributie.view.AfisEtape"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" >
         </activity>

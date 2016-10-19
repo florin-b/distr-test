@@ -4,31 +4,57 @@
  */
 package com.distributie.view;
 
-import com.example.distributie.R;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainMenu extends Activity {
+import com.distributie.beans.BeanAlarma;
+import com.distributie.beans.BeanClientAlarma;
+import com.distributie.beans.BeanEvenimentStop;
+import com.distributie.dialog.SugestieEvenimentDialog;
+import com.distributie.enums.EnumMotivOprire;
+import com.distributie.enums.EnumNetworkStatus;
+import com.distributie.enums.EnumOperatiiEvenimente;
+import com.distributie.enums.EnumTipAlarma;
+import com.distributie.listeners.EvenimentDialogListener;
+import com.distributie.listeners.OperatiiBorderouriListener;
+import com.distributie.listeners.OperatiiEvenimenteListener;
+import com.distributie.model.CurrentStatus;
+import com.distributie.model.OperatiiBorderouriDAOImpl;
+import com.distributie.model.OperatiiEvenimente;
+
+public class MainMenu extends Activity implements OperatiiBorderouriListener, OperatiiEvenimenteListener, EvenimentDialogListener {
 
 	GridView mainGridView;
 
-	private String[] btnNames = { "Sofer", "Borderouri", "Livrare", "Istoric", "Test", "Iesire" };
+	private String[] btnNames = { "Etape", "Istoric", "Iesire" };
 
-	private int[] btnIcons = new int[] { R.drawable.chauffeur_hat, R.drawable.documents_icon, R.drawable.delivery,
-			R.drawable.history, R.drawable.test_connection, R.drawable.exit };
+	private int[] btnIcons = new int[] { R.drawable.delivery, R.drawable.history, R.drawable.exit };
+
+	private Handler handler = new Handler();
+	private OperatiiBorderouriDAOImpl opBordeoruri;
+	private Timer timer;
+	private TimerTask timerTask;
+	private OperatiiEvenimente opEvenimente;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,6 +75,97 @@ public class MainMenu extends Activity {
 			Toast.makeText(getBaseContext(), ex.toString(), Toast.LENGTH_LONG).show();
 		}
 
+		/*
+		 * opBordeoruri = new OperatiiBorderouriDAOImpl(this);
+		 * opBordeoruri.setEventListener(this);
+		 * 
+		 * opEvenimente = new OperatiiEvenimente(this);
+		 * opEvenimente.setOperatiiEvenimenteListener(this);
+		 * 
+		 * startTimerTask();
+		 */
+
+		Intent nextScreen = new Intent(MainMenu.this, AfisEtape.class);
+		startActivity(nextScreen);
+		finish();
+
+	}
+
+	private void startTimerTask() {
+
+		timer = new Timer();
+		initializeTimerTask();
+		// timer.schedule(timerTask, 300000, 300000);
+
+		timer.schedule(timerTask, 5000, 5000);
+
+	}
+
+	public void stopTimerTask() {
+
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
+	}
+
+	public void initializeTimerTask() {
+
+		timerTask = new TimerTask() {
+			public void run() {
+				handler.post(new Runnable() {
+					public void run() {
+
+						getEvenimente();
+
+					}
+				});
+			}
+		};
+	}
+
+	private void getEvenimente() {
+
+		if (CurrentStatus.getInstance().getNrBorderou() != null) {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("codBorderou", CurrentStatus.getInstance().getNrBorderou());
+
+			opEvenimente.getEvenimentStop(params);
+		}
+
+	}
+
+	private void incarcaEvenimente(BeanEvenimentStop evenimentStop) {
+
+		if (!evenimentStop.isEvenimentSalvat()) {
+			List<BeanAlarma> listEv = new ArrayList<BeanAlarma>();
+
+			for (BeanClientAlarma client : evenimentStop.getClientiAlarma()) {
+				BeanAlarma b = new BeanAlarma();
+				b.setTipAlarma(EnumTipAlarma.CLIENT);
+				b.setNumeAlarma("Sosire " + client.getNume());
+				b.setCodAlarma(client.getCodClient());
+				b.setCodAdresa(client.getCodAdresa());
+				listEv.add(b);
+			}
+
+			for (EnumMotivOprire motiv : EnumMotivOprire.values()) {
+
+				BeanAlarma b = new BeanAlarma();
+				b.setTipAlarma(EnumTipAlarma.EVENIMENT);
+				b.setNumeAlarma(motiv.getNume());
+				b.setCodAlarma(String.valueOf(motiv.getCod()));
+				b.setIdEveniment(evenimentStop.getIdEveniment());
+				listEv.add(b);
+			}
+
+			stopTimerTask();
+
+			SugestieEvenimentDialog sugestie = new SugestieEvenimentDialog(MainMenu.this, listEv);
+			sugestie.setEvenimentDialogListener(this);
+			sugestie.show();
+
+		}
 	}
 
 	public class ButtonAdapter extends BaseAdapter {
@@ -132,7 +249,7 @@ public class MainMenu extends Activity {
 
 					try {
 
-						Intent nextScreen = new Intent(MainMenu.this, Evenimente.class);
+						Intent nextScreen = new Intent(MainMenu.this, BorderouriView.class);
 						startActivity(nextScreen);
 
 						finish();
@@ -149,6 +266,22 @@ public class MainMenu extends Activity {
 					try {
 
 						Intent nextScreen = new Intent(MainMenu.this, Livrare.class);
+						startActivity(nextScreen);
+
+						finish();
+
+					} catch (Exception e) {
+						Toast.makeText(MainMenu.this, e.toString(), Toast.LENGTH_SHORT).show();
+					}
+
+				}
+
+				// etape
+				if (selectedBtnName.equalsIgnoreCase("Etape")) {
+
+					try {
+
+						Intent nextScreen = new Intent(MainMenu.this, AfisEtape.class);
 						startActivity(nextScreen);
 
 						finish();
@@ -204,6 +337,33 @@ public class MainMenu extends Activity {
 
 	}
 
+	private void showCustomDialog(String bordStarted) {
+
+		boolean isBordStarted = Boolean.valueOf(bordStarted);
+
+		if (!isBordStarted) {
+			final Dialog dialog = new Dialog(this);
+			dialog.setContentView(R.layout.dialog_start_bord);
+			dialog.setTitle("Atentie!");
+
+			TextView text = (TextView) dialog.findViewById(R.id.text);
+			text.setText("Marcati evenimentul Start Borderou!");
+
+			Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+
+			dialogButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					startTimerTask();
+					dialog.dismiss();
+				}
+			});
+
+			dialog.show();
+			stopTimerTask();
+		}
+	}
+
 	private int getNrBtns() {
 		return btnNames.length;
 	}
@@ -217,4 +377,39 @@ public class MainMenu extends Activity {
 		return this.btnIcons[btnPos];
 	}
 
+	@Override
+	public void finish() {
+		stopTimerTask();
+		super.finish();
+	}
+
+	@Override
+	public void eventComplete(String result, EnumOperatiiEvenimente methodName, EnumNetworkStatus networkStatus) {
+		switch (methodName) {
+		case CHECK_BORD_STARTED:
+			showCustomDialog(result);
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	@Override
+	public void opEventComplete(String result, EnumOperatiiEvenimente methodName) {
+		switch (methodName) {
+		case CHECK_STOP:
+			incarcaEvenimente(opEvenimente.deserializeEvenimentStop(result));
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	@Override
+	public void evenimentDialogProduced() {
+		startTimerTask();
+
+	}
 }

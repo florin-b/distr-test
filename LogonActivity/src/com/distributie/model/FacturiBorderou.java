@@ -2,14 +2,13 @@ package com.distributie.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 import android.content.Context;
 
 import com.distributie.beans.Factura;
+import com.distributie.enums.TipBorderou;
 import com.distributie.view.CustomAdapter;
-import com.example.distributie.R;
-
+import com.distributie.view.R;
 
 public class FacturiBorderou {
 
@@ -21,20 +20,20 @@ public class FacturiBorderou {
 		this.context = context;
 	}
 
-	public CustomAdapter getFacturiBorderouAdapter(ArrayList<Factura> facturiArray, String tipDocument) {
+	public CustomAdapter getFacturiBorderouAdapter(ArrayList<Factura> facturiArray, TipBorderou tipDocument, boolean showTraseu) {
 
 		CustomAdapter adapterFacturi = null;
 		arrayListFacturi = new ArrayList<HashMap<String, String>>();
 
 		HashMap<String, String> temp = null;
 
-		if (tipDocument.toLowerCase(Locale.getDefault()).equals("distributie")) {
+		if (tipDocument == TipBorderou.DISTRIBUTIE) {
 
 			adapterFacturi = new CustomAdapter(context, arrayListFacturi, R.layout.custom_row_list_facturi,
 					new String[] { "nrCrt", "numeClient", "codClient", "adresaClient", "ev1", "timpEv1", "ev2",
 							"timpEv2", "tipClient", "codAdresa" }, new int[] { R.id.textNrCrt, R.id.textNumeClient,
 							R.id.textAdresaClient, R.id.textCodClient, R.id.textEv1, R.id.textTimpEv1, R.id.textEv2,
-							R.id.textTimpEv2, R.id.textTipClient, R.id.textCodAdresa });
+							R.id.textTimpEv2, R.id.textTipClient, R.id.textCodAdresa }, showTraseu);
 
 			for (int i = 0; i < facturiArray.size(); i++) {
 				temp = new HashMap<String, String>();
@@ -50,8 +49,7 @@ public class FacturiBorderou {
 					temp.put("ev1", "Sosire:");
 					temp.put("timpEv1",
 							facturiArray.get(i).getSosireClient().substring(0, 2) + ":"
-									+ facturiArray.get(i).getSosireClient().substring(2, 4) + ":"
-									+ facturiArray.get(i).getSosireClient().substring(4, 6));
+									+ facturiArray.get(i).getSosireClient().substring(2, 4));
 				} else {
 					temp.put("ev1", " ");
 					temp.put("timpEv1", " ");
@@ -60,8 +58,7 @@ public class FacturiBorderou {
 				if (!facturiArray.get(i).getPlecareClient().equals("0")) {
 					temp.put("ev2", "Plecare:");
 					temp.put("timpEv2", facturiArray.get(i).getPlecareClient().substring(0, 2) + ":"
-							+ facturiArray.get(i).getPlecareClient().substring(2, 4) + ":"
-							+ facturiArray.get(i).getPlecareClient().substring(4, 6));
+							+ facturiArray.get(i).getPlecareClient().substring(2, 4));
 				} else {
 
 					temp.put("ev2", " ");
@@ -77,14 +74,18 @@ public class FacturiBorderou {
 
 		}// sf. distributie
 
+		
+		
+		
 		// aprovizionare
-		if (tipDocument.toLowerCase(Locale.getDefault()).equals("aprovizionare")) {
+		if (tipDocument == TipBorderou.APROVIZIONARE || tipDocument == TipBorderou.INCHIRIERE
+				|| tipDocument == TipBorderou.SERVICE) {
 
 			adapterFacturi = new CustomAdapter(context, arrayListFacturi, R.layout.custom_row_list_facturi_aprov,
 					new String[] { "nrCrt", "numeClient", "codClient", "ev1", "timpEv1", "ev2", "timpEv2",
-							"adresaClient", "tipClient" }, new int[] { R.id.textNrCrt, R.id.textNumeClient,
-							R.id.textCodClient, R.id.textEv1, R.id.textTimpEv1, R.id.textEv2, R.id.textTimpEv2,
-							R.id.textAdresaClient, R.id.textTipClient });
+							"adresaClient", "tipClient", "btnTraseu" }, new int[] { R.id.textNrCrt,
+							R.id.textNumeClient, R.id.textCodClient, R.id.textEv1, R.id.textTimpEv1, R.id.textEv2,
+							R.id.textTimpEv2, R.id.textAdresaClient, R.id.textTipClient, R.id.btnTraseu }, showTraseu);
 
 			int lastIndex = 1;
 
@@ -100,12 +101,12 @@ public class FacturiBorderou {
 					temp.put("adresaClient", facturiArray.get(i).getAdresaFurnizor());
 					temp.put("tipClient", "f");
 					temp.put("codAdresa", facturiArray.get(i).getCodAdresaFurnizor());
+					
 
 					if (!facturiArray.get(i).getSosireFurnizor().equals("0")) {
 						temp.put("ev1", "Sosire:");
 						temp.put("timpEv1", facturiArray.get(i).getSosireFurnizor().substring(0, 2) + ":"
-								+ facturiArray.get(i).getSosireFurnizor().substring(2, 4) + ":"
-								+ facturiArray.get(i).getSosireFurnizor().substring(4, 6));
+								+ facturiArray.get(i).getSosireFurnizor().substring(2, 4));
 					} else {
 						temp.put("ev1", " ");
 						temp.put("timpEv1", " ");
@@ -114,8 +115,7 @@ public class FacturiBorderou {
 					if (!facturiArray.get(i).getPlecareFurnizor().equals("0")) {
 						temp.put("ev2", "Plecare:");
 						temp.put("timpEv2", facturiArray.get(i).getPlecareFurnizor().substring(0, 2) + ":"
-								+ facturiArray.get(i).getPlecareFurnizor().substring(2, 4) + ":"
-								+ facturiArray.get(i).getPlecareFurnizor().substring(4, 6));
+								+ facturiArray.get(i).getPlecareFurnizor().substring(2, 4));
 					} else {
 
 						temp.put("ev2", " ");
@@ -137,8 +137,7 @@ public class FacturiBorderou {
 					if (!facturiArray.get(i).getSosireClient().equals("0")) {
 						temp.put("ev1", "Sosire:");
 						temp.put("timpEv1", facturiArray.get(i).getSosireClient().substring(0, 2) + ":"
-								+ facturiArray.get(i).getSosireClient().substring(2, 4) + ":"
-								+ facturiArray.get(i).getSosireClient().substring(4, 6));
+								+ facturiArray.get(i).getSosireClient().substring(2, 4));
 					} else {
 						temp.put("ev1", " ");
 						temp.put("timpEv1", " ");
@@ -147,8 +146,7 @@ public class FacturiBorderou {
 					if (!facturiArray.get(i).getPlecareClient().equals("0")) {
 						temp.put("ev2", "Plecare:");
 						temp.put("timpEv2", facturiArray.get(i).getPlecareClient().substring(0, 2) + ":"
-								+ facturiArray.get(i).getPlecareClient().substring(2, 4) + ":"
-								+ facturiArray.get(i).getPlecareClient().substring(4, 6));
+								+ facturiArray.get(i).getPlecareClient().substring(2, 4));
 					} else {
 
 						temp.put("ev2", " ");
@@ -167,12 +165,12 @@ public class FacturiBorderou {
 					temp.put("adresaClient", facturiArray.get(i).getAdresaClient());
 					temp.put("tipClient", "c");
 					temp.put("codAdresa", facturiArray.get(i).getCodAdresaClient());
+					
 
 					if (!facturiArray.get(i).getSosireClient().equals("0")) {
 						temp.put("ev1", "Sosire:");
 						temp.put("timpEv1", facturiArray.get(i).getSosireClient().substring(0, 2) + ":"
-								+ facturiArray.get(i).getSosireClient().substring(2, 4) + ":"
-								+ facturiArray.get(i).getSosireClient().substring(4, 6));
+								+ facturiArray.get(i).getSosireClient().substring(2, 4));
 					} else {
 						temp.put("ev1", " ");
 						temp.put("timpEv1", " ");
@@ -181,8 +179,7 @@ public class FacturiBorderou {
 					if (!facturiArray.get(i).getPlecareClient().equals("0")) {
 						temp.put("ev2", "Plecare:");
 						temp.put("timpEv2", facturiArray.get(i).getPlecareClient().substring(0, 2) + ":"
-								+ facturiArray.get(i).getPlecareClient().substring(2, 4) + ":"
-								+ facturiArray.get(i).getPlecareClient().substring(4, 6));
+								+ facturiArray.get(i).getPlecareClient().substring(2, 4));
 					} else {
 
 						temp.put("ev2", " ");
@@ -193,7 +190,7 @@ public class FacturiBorderou {
 
 				}
 
-				if (InfoStrings.getCurentClient(context).equals(facturiArray.get(i).getCodFurnizor())) {
+				if (CurrentStatus.getInstance().getCurrentClient().equals(facturiArray.get(i).getCodFurnizor())) {
 					selectedClientIndex = i;
 				}
 
@@ -206,8 +203,13 @@ public class FacturiBorderou {
 	}
 
 	private boolean isClientSelected(ArrayList<Factura> facturiArray, int pos) {
-		return InfoStrings.getCurentClient(context).equals(facturiArray.get(pos).getCodClient())
-				&& InfoStrings.getCurentClientAddr(context).equals(facturiArray.get(pos).getCodAdresaClient());
+		try {
+			return CurrentStatus.getInstance().getCurrentClient().equals(facturiArray.get(pos).getCodClient())
+					&& CurrentStatus.getInstance().getCurentClientAddr()
+							.equals(facturiArray.get(pos).getCodAdresaClient());
+		} catch (Exception ex) {
+			return false;
+		}
 	}
 
 	public int getSelectedClientIndex() {

@@ -5,6 +5,7 @@ public class InitStatus {
 	private String document;
 	private String client;
 	private String eveniment;
+	
 
 	private static InitStatus instance = new InitStatus();
 

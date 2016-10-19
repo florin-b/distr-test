@@ -2,6 +2,8 @@ package com.distributie.beans;
 
 public class Factura {
 
+	private String nrFactura;
+
 	private String codClient;
 	private String numeClient;
 	private String adresaClient;
@@ -15,10 +17,20 @@ public class Factura {
 	private String sosireFurnizor;
 	private String plecareFurnizor;
 	private String codAdresaFurnizor;
-	
+
 	private String dataStartCursa;
 
+	private String pozitie;
+
 	public Factura() {
+	}
+
+	public String getNrFactura() {
+		return nrFactura;
+	}
+
+	public void setNrFactura(String nrFactura) {
+		this.nrFactura = nrFactura;
 	}
 
 	public String getCodClient() {
@@ -125,7 +137,21 @@ public class Factura {
 		this.dataStartCursa = dataStartCursa;
 	}
 
-	
-	
-	
+	public String getPozitie() {
+		return pozitie;
+	}
+
+	public void setPozitie(String pozitie) {
+		this.pozitie = pozitie;
+	}
+
+	@Override
+	public String toString() {
+		return "Factura [nrFactura=" + nrFactura + ", codClient=" + codClient + ", numeClient=" + numeClient + ", adresaClient=" + adresaClient
+				+ ", sosireClient=" + sosireClient + ", plecareClient=" + plecareClient + ", codAdresaClient=" + codAdresaClient + ", codFurnizor="
+				+ codFurnizor + ", numeFurnizor=" + numeFurnizor + ", adresaFurnizor=" + adresaFurnizor + ", sosireFurnizor=" + sosireFurnizor
+				+ ", plecareFurnizor=" + plecareFurnizor + ", codAdresaFurnizor=" + codAdresaFurnizor + ", dataStartCursa=" + dataStartCursa + ", pozitie="
+				+ pozitie + "]";
+	}
+
 }

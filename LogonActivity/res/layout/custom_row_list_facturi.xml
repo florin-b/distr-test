@@ -42,7 +42,7 @@
             android:layout_gravity="bottom|right"
             android:layout_weight="0.0"
             android:textSize="1sp" />
-        
+
         <TextView
             android:id="@+id/textTipClient"
             android:layout_width="0dp"
@@ -50,15 +50,14 @@
             android:layout_gravity="bottom|right"
             android:layout_weight="0.0"
             android:textSize="1sp" />
-                
+
         <TextView
             android:id="@+id/textCodAdresa"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
             android:layout_weight="0.0"
-            android:textSize="1sp" />        
-        
+            android:textSize="1sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -81,6 +80,18 @@
             android:textColor="@color/rowColorAdresa"
             android:textSize="22sp"
             android:typeface="serif" />
+
+        <TextView
+            android:id="@+id/btnTraseu"
+            android:layout_width="wrap_content"
+            android:layout_height="50dip"
+            android:layout_gravity="bottom|right"
+            android:text="Traseu"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip"
+            android:textSize="22sp"
+            android:typeface="serif" >
+        </TextView>
     </LinearLayout>
 
     <LinearLayout

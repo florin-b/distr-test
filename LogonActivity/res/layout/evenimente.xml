@@ -9,11 +9,5 @@
         android:layout_alignParentLeft="true"
         layout="@layout/evenimente_header" />
 
-    <include
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        layout="@layout/evenimente_bottom" />
 
 </RelativeLayout>

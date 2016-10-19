@@ -4,7 +4,6 @@
  */
 package com.distributie.view;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -24,12 +23,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.distributie.listeners.AsyncTaskListener;
 import com.distributie.listeners.FmsTestListener;
-import com.distributie.model.AsyncTaskWSCall;
 import com.distributie.model.FmsDataTestImpl;
-import com.distributie.model.InfoStrings;
-import com.example.distributie.R;
+
 
 public class TestConnection extends Activity implements FmsTestListener {
 
@@ -143,8 +139,8 @@ public class TestConnection extends Activity implements FmsTestListener {
 			textData.setText(fmsToken[0] + " " + fmsToken[1].substring(0, 2) + ":" + fmsToken[1].substring(2, 4) + ":"
 					+ fmsToken[1].substring(4, 6));
 
-			textKilometraj.setText(InfoStrings.getKMFromFMS(fmsToken[3]) + " km");
-			textNivelCombustibil.setText(InfoStrings.getFuelLevelFromFMS(fmsToken[3]) + "%");
+			textKilometraj.setText("0 km");
+			textNivelCombustibil.setText("0 %");
 			textLocatie.setText(getAddress(latid, longit));
 
 		} else {

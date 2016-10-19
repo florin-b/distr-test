@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import com.example.distributie.R;
+
 
 import android.content.Context;
 import android.view.LayoutInflater;

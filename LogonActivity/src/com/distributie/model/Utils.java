@@ -121,7 +121,7 @@ public class Utils {
 		return (sb.toString());
 	}
 
-	public static String getFiliala(String numeFiliala) {
+	public static String getCodFiliala(String numeFiliala) {
 		String fl = "NN10";
 
 		if (numeFiliala.equals("BACAU"))
@@ -185,4 +185,73 @@ public class Utils {
 
 	}
 
+	
+	
+	public static String getNumeFiliala(String codFiliala) {
+		String fl = "NN10";
+
+		if (codFiliala.equals("BC10"))
+			fl = "BACAU";
+
+		if (codFiliala.equals("GL10"))
+			fl = "GALATI";
+
+		if (codFiliala.equals("AG10"))
+			fl = "PITESTI";
+
+		if (codFiliala.equals("TM10"))
+			fl = "TIMISOARA";
+
+		if (codFiliala.equals("BH10"))
+			fl = "ORADEA";
+
+		if (codFiliala.equals("VN10"))
+			fl = "FOCSANI";
+
+		if (codFiliala.equals("BU10"))
+			fl = "GLINA";
+
+		if (codFiliala.equals("BU13"))
+			fl = "ANDRONACHE";
+
+		if (codFiliala.equals("BU12"))
+			fl = "OTOPENI";
+
+		if (codFiliala.equals("CJ10"))
+			fl = "CLUJ";
+
+		if (codFiliala.equals("MM10"))
+			fl = "BAIA MARE";
+
+		if (codFiliala.equals("BU11"))
+			fl = "MILITARI";
+
+		if (codFiliala.equals("CT10"))
+			fl = "CONSTANTA";
+
+		if (codFiliala.equals("BV10"))
+			fl = "BRASOV";
+
+		if (codFiliala.equals("PH10"))
+			fl = "PLOIESTI";
+
+		if (codFiliala.equals("NT10"))
+			fl = "PIATRA NEAMT";
+
+		if (codFiliala.equals("MS10"))
+			fl = "MURES";
+
+		if (codFiliala.equals("IS10"))
+			fl = "IASI";
+
+		if (codFiliala.equals("DJ10"))
+			fl = "CRAIOVA";
+
+		return fl;
+
+	}
+	
+	
+	
+	
 }

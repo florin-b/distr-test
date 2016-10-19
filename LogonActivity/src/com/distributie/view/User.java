@@ -5,7 +5,8 @@
 package com.distributie.view;
 
 import com.distributie.model.UserInfo;
-import com.example.distributie.R;
+import com.distributie.model.Utils;
+
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -17,7 +18,7 @@ import android.widget.Toast;
 
 public class User extends Activity {
 
-	private TextView textNumeSofer, textFilialaSofer, textCodSofer, textNrAuto;
+	private TextView textNumeSofer, textFilialaSofer, textCodSofer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -41,13 +42,12 @@ public class User extends Activity {
 			textNumeSofer.setText(UserInfo.getInstance().getNume());
 
 			textFilialaSofer = (TextView) findViewById(R.id.textFilialaSofer);
-			textFilialaSofer.setText(UserInfo.getInstance().getFiliala());
+			textFilialaSofer.setText(Utils.getNumeFiliala(UserInfo.getInstance().getFiliala()));
 
 			textCodSofer = (TextView) findViewById(R.id.textCodSofer);
 			textCodSofer.setText(UserInfo.getInstance().getId());
 
-			textNrAuto = (TextView) findViewById(R.id.textNrAuto);
-			textNrAuto.setText("");
+			
 
 		} catch (Exception ex) {
 			Toast.makeText(User.this, ex.toString(), Toast.LENGTH_SHORT).show();

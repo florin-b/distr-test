@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import android.content.Context;
 
+import com.distributie.enums.EnumNetworkStatus;
 import com.distributie.listeners.AsyncTaskListener;
 import com.distributie.listeners.FmsTestListener;
 
@@ -29,7 +30,7 @@ public class FmsDataTestImpl implements FmsDataTest, AsyncTaskListener {
 	}
 
 	@Override
-	public void onTaskComplete(String methodName, String result) {
+	public void onTaskComplete(String methodName, String result, EnumNetworkStatus networkStatus) {
 		if (listener != null) {
 			listener.testComplete(result);
 		}

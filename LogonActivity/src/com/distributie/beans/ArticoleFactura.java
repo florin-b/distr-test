@@ -70,4 +70,10 @@ public class ArticoleFactura {
 		this.umGreutate = umGreutate;
 	}
 
+	
+	
+	
+	
+	
+
 }

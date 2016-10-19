@@ -7,9 +7,6 @@ package com.distributie.view;
 import java.util.HashMap;
 import java.util.List;
 
-import com.example.distributie.R;
-
-
 
 import android.content.Context;
 import android.view.LayoutInflater;

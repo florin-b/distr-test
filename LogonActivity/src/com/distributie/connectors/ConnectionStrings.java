@@ -2,7 +2,7 @@
  * @author florinb
  *
  */
-package com.distributie.model;
+package com.distributie.connectors;
 
 public class ConnectionStrings {
 
@@ -13,8 +13,8 @@ public class ConnectionStrings {
 	private String myDatabase;
 
 	private ConnectionStrings() {
-		myUrl = "http://10.1.0.58/AndroidWebServices/DistributieTESTService.asmx";
-		myNamespace = "http://distributieTest.org/";
+		this.myUrl = "http://10.1.0.58/AndroidWebServices/DistributieTESTService.asmx";
+		this.myNamespace = "http://distributieTest.org/";
 
 	}
 

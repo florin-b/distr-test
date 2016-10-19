@@ -52,6 +52,7 @@ public class HandleJSONData {
 				unBorderou.setDataEmiterii(borderouObject.getString("dataEmiterii"));
 				unBorderou.setEvenimentBorderou(borderouObject.getString("evenimentBorderou"));
 				unBorderou.setTipBorderou(borderouObject.getString("tipBorderou"));
+				unBorderou.setBordParent(borderouObject.getString("bordParent"));
 				objectsList.add(unBorderou);
 
 			}
@@ -70,6 +71,7 @@ public class HandleJSONData {
 		ArrayList<Factura> objectsList = new ArrayList<Factura>();
 
 		try {
+
 			jsonObject = new JSONArray(JSONString);
 
 			for (int i = 0; i < jsonObject.length(); i++) {
@@ -92,6 +94,9 @@ public class HandleJSONData {
 				oFactura.setCodAdresaClient(facturaObject.getString("codAdresaClient"));
 
 				oFactura.setDataStartCursa(facturaObject.getString("dataStartCursa"));
+
+				oFactura.setPozitie(facturaObject.getString("pozitie"));
+				oFactura.setNrFactura(facturaObject.getString("nrFactura"));
 
 				objectsList.add(oFactura);
 
@@ -206,28 +211,31 @@ public class HandleJSONData {
 
 			JSONObject jsonObject = new JSONObject(JSONString);
 
-			userInfo.setLogonStatus(jsonObject.get("status").toString());
-			userInfo.setDepartament(jsonObject.get("departament").toString());
-			userInfo.setFiliala(jsonObject.get("filiala").toString());
-			userInfo.setTipAcces(jsonObject.get("tipAcces").toString());
+			if (!jsonObject.get("id").equals(null)) {
 
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < 8 - jsonObject.get("id").toString().length(); i++) {
-				sb.append('0');
-			}
-			sb.append(jsonObject.get("id"));
+				StringBuffer sb = new StringBuffer();
+				for (int i = 0; i < 8 - jsonObject.get("id").toString().length(); i++) {
+					sb.append('0');
+				}
+				sb.append(jsonObject.get("id"));
 
-			userInfo.setId(sb.toString());
-			userInfo.setNume(jsonObject.get("nume").toString());
-			userInfo.setUnitLog(jsonObject.get("filiala").toString());
+				userInfo.setId(sb.toString());
+				userInfo.setNume(jsonObject.get("nume").toString());
+				userInfo.setFiliala(jsonObject.get("filiala").toString());
 
-			InitStatus initStatus = InitStatus.getInstance();
+				InitStatus initStatus = InitStatus.getInstance();
 
-			if (!jsonObject.get("initStatus").equals(null)) {
-				JSONObject jsonStatus = new JSONObject(jsonObject.get("initStatus").toString());
-				initStatus.setClient(jsonStatus.get("client").toString());
-				initStatus.setDocument(jsonStatus.get("document").toString());
-				initStatus.setEveniment(jsonStatus.get("eveniment").toString());
+				if (!jsonObject.get("initStatus").equals(null)) {
+					JSONObject jsonStatus = new JSONObject(jsonObject.get("initStatus").toString());
+					initStatus.setClient(jsonStatus.get("client").toString());
+					initStatus.setDocument(jsonStatus.get("document").toString());
+					initStatus.setEveniment(jsonStatus.get("eveniment").toString());
+
+					CurrentStatus.getInstance().setCurrentClient(initStatus.getClient());
+					CurrentStatus.getInstance().setNrBorderou(initStatus.getDocument());
+					CurrentStatus.getInstance().setEveniment(initStatus.getEveniment());
+					CurrentStatus.getInstance().setTipBorderou(InfoStrings.getStringTipBorderou(jsonStatus.get("tipDocument").toString()));
+				}
 			}
 
 		} catch (JSONException e) {

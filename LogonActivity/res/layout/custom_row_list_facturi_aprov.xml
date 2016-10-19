@@ -64,6 +64,9 @@
             android:textColor="@color/rowColorAdresa"
             android:textSize="22sp"
             android:typeface="serif" />
+
+       
+       
     </LinearLayout>
 
     <LinearLayout

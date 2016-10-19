@@ -7,14 +7,13 @@
     android:orientation="horizontal" >
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutBorderouri"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_weight="0.57"
         android:orientation="vertical" >
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
@@ -64,11 +63,24 @@
             android:layout_marginLeft="10dip"
             android:layout_marginTop="20dip"
             android:paddingLeft="40dip"
-            android:paddingRight="40dip" />
+            android:paddingRight="40dip"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/saveIncarcare"
+            style="@style/btnStyleEvent3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="20dip"
+            android:paddingBottom="20dip"
+            android:paddingLeft="80dip"
+            android:paddingRight="80dip"
+            android:paddingTop="20dip"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/evenimenteLayout"
         android:layout_width="0dip"
         android:layout_height="match_parent"
@@ -77,22 +89,34 @@
         android:orientation="vertical" >
     </LinearLayout>
 
+    <RelativeLayout
+        android:id="@+id/layoutNoBord"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Nu exista borderouri. "
+            android:textColor="#D2691E"
+            android:textSize="30sp"
+            android:typeface="sans" />
+    </RelativeLayout>
+
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_weight="0.4"
         android:orientation="vertical" >
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/layoutOutEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dip"
@@ -116,7 +140,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -145,7 +168,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -174,7 +196,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -204,7 +225,6 @@
         </LinearLayout>
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/layoutInEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -212,7 +232,6 @@
             android:orientation="vertical" >
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dip"
@@ -236,7 +255,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -265,7 +283,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -294,7 +311,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -324,7 +340,6 @@
         </LinearLayout>
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/layoutDetBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -342,7 +357,6 @@
         </LinearLayout>
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/layoutTotalTrip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -350,7 +364,6 @@
             android:orientation="vertical" >
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dip"
@@ -374,7 +387,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
@@ -389,7 +401,7 @@
                     android:textColor="@color/rowColor6"
                     android:textSize="23sp" />
 
-               <TextView
+                <TextView
                     android:id="@+id/textTripTime"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
@@ -403,7 +415,6 @@
             </LinearLayout>
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >

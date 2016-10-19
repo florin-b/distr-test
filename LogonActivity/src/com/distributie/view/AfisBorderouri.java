@@ -23,6 +23,8 @@ import butterknife.InjectView;
 
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Factura;
+import com.distributie.enums.EnumOperatiiBorderou;
+import com.distributie.enums.TipBorderou;
 import com.distributie.listeners.BorderouriDAOListener;
 import com.distributie.listeners.CustomSpinnerListener;
 import com.distributie.model.BorderouriDAOImpl;
@@ -30,9 +32,8 @@ import com.distributie.model.FacturiBorderou;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.InfoStrings;
 import com.distributie.model.UserInfo;
-import com.example.distributie.R;
 
-public class AfisBorderouri extends Activity implements CustomSpinnerListener, BorderouriDAOListener {
+public final class AfisBorderouri extends Activity implements CustomSpinnerListener, BorderouriDAOListener {
 
 	private Dialog dialogSelInterval;
 	private String intervalAfisare = "0";
@@ -41,10 +42,9 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 	private static ArrayList<HashMap<String, String>> listBorderouri = new ArrayList<HashMap<String, String>>();
 	private static ArrayList<HashMap<String, String>> listEvenimente = new ArrayList<HashMap<String, String>>();
 
-	private static String selectedBorderou = "0", selectedTip = "0";
+	private static String selectedBorderou = "0";
+	private TipBorderou selectedTip;
 
-	@InjectView(R.id.pw_spinner)
-	ProgressWheel pw;
 	@InjectView(R.id.listEvenimente)
 	ListView listViewEvenimente;
 	@InjectView(R.id.textStartBorderou)
@@ -53,8 +53,8 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 	Spinner spinnerBorderouri;
 
 	private CustomSpinnerClass borderouClass;
-
 	private Activity context;
+	BorderouriDAOImpl borderouri;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,6 +65,9 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 		ActionBar actionBar = getActionBar();
 		actionBar.setTitle("Afisare borderou");
 		actionBar.setDisplayHomeAsUpEnabled(true);
+
+		borderouri = BorderouriDAOImpl.getInstance(this);
+		borderouri.setBorderouEventListener(this);
 
 		ButterKnife.inject(this);
 		InitialUISetup();
@@ -78,7 +81,6 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 		try {
 
 			textStartBorderou.setVisibility(View.GONE);
-			pw.setVisibility(View.INVISIBLE);
 
 			borderouClass = new CustomSpinnerClass();
 
@@ -178,7 +180,7 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 			return true;
 
 		case android.R.id.home:
-			
+
 			Intent nextScreen = new Intent(this, MainMenu.class);
 			startActivity(nextScreen);
 			finish();
@@ -193,28 +195,14 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 	@Override
 	public void onBackPressed() {
 
-		
 		Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
 		startActivity(nextScreen);
 		finish();
 		return;
 	}
 
-	private void startSpinner() {
-		pw.setVisibility(View.VISIBLE);
-		pw.spin();
-
-	}
-
-	private void stopSpinner() {
-		pw.setVisibility(View.INVISIBLE);
-		pw.stopSpinning();
-	}
-
 	public void performIncarcaBorderouri(String intervalAfisare) {
 		try {
-
-			startSpinner();
 
 			selectedBorderou = "0";
 			listEvenimente.clear();
@@ -224,9 +212,7 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 			listViewEvenimente.setAdapter(adapterEvenimente);
 			listViewEvenimente.setVisibility(View.INVISIBLE);
 
-			BorderouriDAOImpl bord = new BorderouriDAOImpl(this);
-			bord.setBorderouEventListener(this);
-			bord.getBorderouri(UserInfo.getInstance().getId(), "t", intervalAfisare);
+			borderouri.getBorderouri(UserInfo.getInstance().getId(), "t", intervalAfisare);
 
 		} catch (Exception e) {
 			Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
@@ -254,7 +240,8 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 				temp.put("nrCrt", String.valueOf(i + 1) + ".");
 				temp.put("codBorderou", borderouriArray.get(i).getNumarBorderou());
 				temp.put("dataBorderou", borderouriArray.get(i).getDataEmiterii());
-				temp.put("tipBorderou", InfoStrings.getStringTipBorderou(borderouriArray.get(i).getTipBorderou()));
+				temp.put("tipBorderou", InfoStrings.getStringTipBorderou(borderouriArray.get(i).getTipBorderou())
+						.toString());
 				temp.put("eveniment", borderouriArray.get(i).getEvenimentBorderou());
 
 				listBorderouri.add(temp);
@@ -273,12 +260,7 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 	public void performGetBorderouEvents() {
 
 		try {
-			startSpinner();
-
-			BorderouriDAOImpl borderouri = new BorderouriDAOImpl(this);
-			borderouri.setBorderouEventListener(this);
 			borderouri.getFacturiBorderou(selectedBorderou, selectedTip);
-
 		} catch (Exception ex) {
 			Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show();
 
@@ -302,7 +284,7 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 				String tempDataStartCursa = facturiArray.get(0).getDataStartCursa();
 
 				FacturiBorderou facturi = new FacturiBorderou(context);
-				listViewEvenimente.setAdapter(facturi.getFacturiBorderouAdapter(facturiArray, selectedTip));
+				listViewEvenimente.setAdapter(facturi.getFacturiBorderouAdapter(facturiArray, selectedTip, false));
 
 				if (tempDataStartCursa.length() > 0) {
 					String[] varTokStartBord = tempDataStartCursa.split(":");
@@ -327,22 +309,24 @@ public class AfisBorderouri extends Activity implements CustomSpinnerListener, B
 
 		if (spinnerId == R.id.spinnerBorderouri) {
 			selectedBorderou = map.get("codBorderou");
-			selectedTip = map.get("tipBorderou");
+			selectedTip = TipBorderou.valueOf(map.get("tipBorderou"));
 			performGetBorderouEvents();
 		}
 
 	}
 
 	@Override
-	public void loadComplete(String result, String methodName) {
-		stopSpinner();
+	public void loadComplete(String result, EnumOperatiiBorderou methodName) {
 
-		if (methodName.equals("getBorderouri")) {
+		switch (methodName) {
+		case GET_BORDEROURI:
 			populateListBorderouri(result);
-		}
-
-		if (methodName.equals("getFacturiBorderou")) {
+			break;
+		case GET_FACTURI_BORDEROU:
 			populateEventsList(result);
+			break;
+		default:
+			break;
 		}
 
 	}

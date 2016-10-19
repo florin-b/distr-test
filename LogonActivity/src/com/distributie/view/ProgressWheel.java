@@ -5,11 +5,6 @@
 package com.distributie.view;
 
 
-
-
-
-import com.example.distributie.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;

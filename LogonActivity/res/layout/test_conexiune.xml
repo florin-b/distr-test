@@ -9,11 +9,4 @@
         android:layout_alignParentLeft="true"
         layout="@layout/test_conexiune_header" />
 
-    <include
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        layout="@layout/test_conexiune_bottom" />
-
 </RelativeLayout>

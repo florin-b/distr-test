@@ -2,7 +2,7 @@
  * @author florinb
  *
  */
-package com.example.distributie;
+package com.distributie.view;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
@@ -19,42 +21,49 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
+
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.telephony.TelephonyManager;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
+import android.view.View.OnTouchListener;
+
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.distributie.beans.InitStatus;
+import com.distributie.enums.EnumNetworkStatus;
+import com.distributie.enums.EnumOperatiiLogon;
 import com.distributie.listeners.AsyncTaskListener;
 import com.distributie.model.HandleJSONData;
-import com.distributie.model.InfoStrings;
+
 import com.distributie.model.LogonImpl;
 import com.distributie.model.LogonListener;
 import com.distributie.model.UserInfo;
-import com.distributie.view.Evenimente;
-import com.distributie.view.Livrare;
-import com.distributie.view.MainMenu;
-import com.distributie.view.ProgressWheel;
-import com.distributie.view.RotaryKnobView;
 
-public class LogonActivity extends Activity implements LogonListener {
+public class LogonActivity extends Activity implements LogonListener, AsyncTaskListener {
 
 	int val = 0;
 
 	ProgressBar progressBarWheel;
-	EditText txtUserName, txtPassword;
+	TextView txtNumeSofer, txtDeviceId;
+	private Handler logonHandler = new Handler();
 
-	ProgressWheel pw;
-	RotaryKnobView jogView;
 	private String buildVer = "0";
+	private boolean allowLogon = false;
+	ImageView logonImage;
+	private Timer myTimer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +85,7 @@ public class LogonActivity extends Activity implements LogonListener {
 			Locale.setDefault(locale);
 			Configuration config = new Configuration();
 			config.locale = locale;
-			getBaseContext().getResources().updateConfiguration(config,
-					getBaseContext().getResources().getDisplayMetrics());
+			getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
 			//
 
 			PackageInfo pInfo = null;
@@ -89,50 +97,22 @@ public class LogonActivity extends Activity implements LogonListener {
 
 			buildVer = String.valueOf(pInfo.versionCode);
 
-			pw = (ProgressWheel) findViewById(R.id.pw_spinner);
-			pw.setVisibility(View.INVISIBLE);
-
 			progressBarWheel = (ProgressBar) findViewById(R.id.progress_bar_wheel);
-
 			progressBarWheel.setVisibility(View.INVISIBLE);
-			txtUserName = (EditText) findViewById(R.id.txtUserName);
-			txtUserName.setHint("Utilizator");
+			logonImage = (ImageView) findViewById(R.id.logonImage);
+			addLogonImageListener();
 
-			txtPassword = (EditText) findViewById(R.id.txtPassword);
-			txtPassword.setHint("Parola");
+			txtNumeSofer = (TextView) findViewById(R.id.txtNumeSofer);
+			txtDeviceId = (TextView) findViewById(R.id.txtDeviceId);
 
-			txtUserName.setText("DVELICU");
-			txtPassword.setText("1234");
+			String deviceId = getDeviceId();
 
-			jogView = (RotaryKnobView) findViewById(R.id.jogView);
-			jogView.setKnobListener(new RotaryKnobView.RotaryKnobListener() {
+			txtDeviceId.setText(deviceId.replaceAll(".{3}", "$0 "));
+			// getCodSofer(deviceId);
 
-				@Override
-				public void onKnobChanged(int arg) {
-
-					if (0 == arg) {
-						val = 0;
-						progressBarWheel.setVisibility(View.INVISIBLE);
-
-					} else {
-						val += 1;
-						progressBarWheel.setVisibility(View.VISIBLE);
-						progressBarWheel.setProgress(val);
-
-						if (progressBarWheel.getProgress() >= 50) {
-							progressBarWheel.setVisibility(View.INVISIBLE);
-							val = 0;
-							jogView.setEnabled(false);
-							startSpinner();
-							performLoginThread();
-
-						}
-
-					}
-
-				}
-
-			});
+			//init - 00120509
+			
+			getCodSofer("355860061488282");
 
 		} catch (Exception ex) {
 			Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
@@ -140,88 +120,111 @@ public class LogonActivity extends Activity implements LogonListener {
 
 	}
 
-	public void performLoginThread() {
-		try {
+	class UpdateProgress extends TimerTask {
+		public void run() {
+			val++;
+			if (progressBarWheel.getProgress() == 50) {
+				logonHandler.post(new Runnable() {
+					public void run() {
+						myTimer.cancel();
+						logonImage.setEnabled(false);
+						checkForUpdate();
 
-			String userN = txtUserName.getText().toString().trim();
-			String passN = txtPassword.getText().toString().trim();
+					}
+
+				});
+
+			} else {
+				progressBarWheel.setProgress(val);
+			}
+
+		}
+	}
+
+	private void addLogonImageListener() {
+		logonImage.setOnTouchListener(new OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					if (allowLogon) {
+						progressBarWheel.setVisibility(View.VISIBLE);
+						progressBarWheel.setProgress(0);
+						val = 0;
+						myTimer = new Timer();
+						myTimer.schedule(new UpdateProgress(), 40, 15);
+					}
+					return true;
+
+				case MotionEvent.ACTION_UP:
+					if (progressBarWheel.getVisibility() == View.VISIBLE) {
+						myTimer.cancel();
+						progressBarWheel.setVisibility(View.INVISIBLE);
+						logonImage.setEnabled(true);
+						return true;
+					}
+				}
+
+				return false;
+			}
+		});
+	}
+
+	private String getDeviceId() {
+		TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		return tm.getDeviceId();
+	}
+
+	private void getCodSofer(String codTableta) {
+
+		LogonImpl logon = new LogonImpl(this);
+		logon.setLogonListener(this);
+		logon.getCodSofer(codTableta);
+
+	}
+
+	public void performLoginThread(String user, String password) {
+		try {
 
 			LogonImpl logon = new LogonImpl(this);
 			logon.setLogonListener(this);
-			logon.performLogon(userN, passN);
+			logon.performLogon(user, password);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	public void validateLogin(String result) {
+	public void checkForUpdate() {
 
-		HandleJSONData objLogon = new HandleJSONData(this, result);
-		objLogon.decodeLogonInfo();
+		try {
+			checkUpdate check = new checkUpdate(this);
+			check.execute("dummy");
 
-		UserInfo userInfo = UserInfo.getInstance();
-
-		if (userInfo.getNume() != null) {
-
-			String[] token = result.split("#");
-
-			if (userInfo.getLogonStatus().equals("0")) {
-				InfoStrings.showCustomToast(this, "Cont inexistent!");
-
-			}
-			if (userInfo.getLogonStatus().equals("1")) {
-				InfoStrings.showCustomToast(this, "Cont blocat 60 de minute!");
-
-			}
-			if (userInfo.getLogonStatus().equals("2")) {
-				InfoStrings.showCustomToast(this, "Parola incorecta!");
-			}
-			if (userInfo.getLogonStatus().equals("3")) {
-
-				if (userInfo.getTipAcces().equals("37")) // sofer
-				{
-
-					String tempAgCod = userInfo.getId();
-
-					if (tempAgCod.equalsIgnoreCase("-1")) {
-						Toast.makeText(getApplicationContext(), "Utilizator nedefinit!", Toast.LENGTH_SHORT).show();
-						return;
-					}
-
-					try {
-						startSpinner();
-						checkUpdate check = new checkUpdate();
-						check.execute("dummy");
-
-					} catch (Exception e) {
-						Toast.makeText(LogonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-					}
-
-				} else {
-					Toast.makeText(getApplicationContext(), "Acces interzis!", Toast.LENGTH_SHORT).show();
-
-				}
-			}
-			if (token[0].equals("4")) {
-				InfoStrings.showCustomToast(this, "Cont inactiv!");
-
-			}
-		} else {
-			InfoStrings.showCustomToast(this, "Autentificare esuata!");
-
+		} catch (Exception e) {
+			Toast.makeText(LogonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 		}
-
-		stopSpinner();
-		jogView.setEnabled(true);
 
 	}
 
 	private class checkUpdate extends AsyncTask<String, Void, String> {
 		String errMessage = "";
 
-		private checkUpdate() {
+		Context mContext;
+		private ProgressDialog dialog;
+
+		private checkUpdate(Context context) {
 			super();
+			this.mContext = context;
+		}
+
+		protected void onPreExecute() {
+
+			this.dialog = new ProgressDialog(mContext);
+			this.dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			this.dialog.setMessage("Verificare versiune aplicatie...");
+			this.dialog.setCancelable(false);
+			this.dialog.show();
 
 		}
 
@@ -244,9 +247,9 @@ public class LogonActivity extends Activity implements LogonListener {
 					mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
 					mFTPClient.enterLocalPassiveMode();
 
-					String sourceFile = "/Update/LiteSFA/DistributieVer.txt";
+					String sourceFile = "/Update/LiteSFA/DistributieVerTEST.txt";
 
-					desFile2 = new FileOutputStream("sdcard/download/DistributieVer.txt");
+					desFile2 = new FileOutputStream("sdcard/download/DistributieVerTEST.txt");
 					mFTPClient.retrieveFile(sourceFile, desFile2);
 
 				} else {
@@ -277,7 +280,10 @@ public class LogonActivity extends Activity implements LogonListener {
 		@Override
 		protected void onPostExecute(String result) {
 			try {
-				stopSpinner();
+				if (dialog != null) {
+					dialog.dismiss();
+					dialog = null;
+				}
 
 				if (!errMessage.equals("")) {
 					Toast toast = Toast.makeText(LogonActivity.this, errMessage, Toast.LENGTH_SHORT);
@@ -300,7 +306,7 @@ public class LogonActivity extends Activity implements LogonListener {
 
 		try {
 
-			File fVer = new File(Environment.getExternalStorageDirectory() + "/download/DistributieVer.txt");
+			File fVer = new File(Environment.getExternalStorageDirectory() + "/download/DistributieVerTEST.txt");
 			fileIS = new FileInputStream(fVer);
 			buf = new BufferedReader(new InputStreamReader(fileIS));
 			String readString = buf.readLine();
@@ -321,7 +327,6 @@ public class LogonActivity extends Activity implements LogonListener {
 
 				} else // nu exista update
 				{
-					stopSpinner();
 					redirectView();
 				}
 
@@ -344,8 +349,20 @@ public class LogonActivity extends Activity implements LogonListener {
 	private class downloadUpdate extends AsyncTask<String, Void, String> {
 		String errMessage = "";
 
+		Context mContext;
+		private ProgressDialog dialog;
+
 		private downloadUpdate(Context context) {
 			super();
+			this.mContext = context;
+		}
+
+		protected void onPreExecute() {
+			this.dialog = new ProgressDialog(mContext);
+			this.dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			this.dialog.setMessage("Descarcare...");
+			this.dialog.setCancelable(false);
+			this.dialog.show();
 
 		}
 
@@ -367,12 +384,12 @@ public class LogonActivity extends Activity implements LogonListener {
 					mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
 					mFTPClient.enterLocalPassiveMode();
 
-					String sourceFile = "/Update/LiteSFA/Distributie.apk";
-					desFile1 = new FileOutputStream("sdcard/download/Distributie.apk");
+					String sourceFile = "/Update/LiteSFA/DistributieTEST.apk";
+					desFile1 = new FileOutputStream("sdcard/download/DistributieTEST.apk");
 					mFTPClient.retrieveFile(sourceFile, desFile1);
 
-					sourceFile = "/Update/LiteSFA/DistributieVer.txt";
-					desFile2 = new FileOutputStream("sdcard/download/DistributieVer.txt");
+					sourceFile = "/Update/LiteSFA/DistributieVerTEST.txt";
+					desFile2 = new FileOutputStream("sdcard/download/DistributieVerTEST.txt");
 					mFTPClient.retrieveFile(sourceFile, desFile2);
 
 				} else {
@@ -406,7 +423,10 @@ public class LogonActivity extends Activity implements LogonListener {
 		protected void onPostExecute(String result) {
 			try {
 
-				stopSpinner();
+				if (dialog != null) {
+					dialog.dismiss();
+					dialog = null;
+				}
 
 				if (!errMessage.equals("")) {
 					Toast toast = Toast.makeText(LogonActivity.this, errMessage, Toast.LENGTH_SHORT);
@@ -423,7 +443,7 @@ public class LogonActivity extends Activity implements LogonListener {
 
 	public void startInstall() {
 
-		String fileUrl = "/download/Distributie.apk";
+		String fileUrl = "/download/DistributieTEST.apk";
 		String file = android.os.Environment.getExternalStorageDirectory().getPath() + fileUrl;
 		File f = new File(file);
 
@@ -431,14 +451,13 @@ public class LogonActivity extends Activity implements LogonListener {
 
 			// start install
 			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/download/"
-					+ "Distributie.apk")), "application/vnd.android.package-archive");
+			intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/download/" + "DistributieTEST.apk")),
+					"application/vnd.android.package-archive");
 			startActivity(intent);
 
 			finish();
 		} else {
-			Toast toast = Toast
-					.makeText(LogonActivity.this, "Fisier corupt, repetati operatiunea!", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(LogonActivity.this, "Fisier corupt, repetati operatiunea!", Toast.LENGTH_SHORT);
 			toast.show();
 
 		}
@@ -447,25 +466,12 @@ public class LogonActivity extends Activity implements LogonListener {
 
 	private void redirectView() {
 
-		InitStatus initStatus = InitStatus.getInstance();
-
-		if (noActivity(initStatus)) {
-			Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
-			startActivity(nextScreen);
-			finish();
-		} else {
-			if (activeDocument(initStatus)) {
-				Intent nextScreen = new Intent(getApplicationContext(), Evenimente.class);
-				startActivity(nextScreen);
-				finish();
-			} else if (activeClient(initStatus)) {
-				Intent nextScreen = new Intent(getApplicationContext(), Livrare.class);
-				startActivity(nextScreen);
-				finish();
-			}
-		}
+		Intent nextScreen = new Intent(getApplicationContext(), MainMenu.class);
+		startActivity(nextScreen);
+		finish();
 
 	}
+
 
 	boolean noActivity(InitStatus initStatus) {
 		return initStatus.getClient() == null;
@@ -479,20 +485,36 @@ public class LogonActivity extends Activity implements LogonListener {
 		return !initStatus.getDocument().equals(initStatus.getClient());
 	}
 
-	private void startSpinner() {
-		pw.setVisibility(View.VISIBLE);
-		pw.spin();
+	private void showNumeSofer(String result) {
 
-	}
+		HandleJSONData objLogon = new HandleJSONData(this, result);
+		objLogon.decodeLogonInfo();
 
-	private void stopSpinner() {
-		pw.setVisibility(View.INVISIBLE);
-		pw.stopSpinning();
+		if (UserInfo.getInstance().getNume() != null) {
+			txtNumeSofer.setText(UserInfo.getInstance().getNume());
+			allowLogon = true;
+		} else {
+			txtNumeSofer.setText("Tableta nealocata");
+			allowLogon = false;
+		}
+
 	}
 
 	@Override
-	public void logonComplete(String result) {
-		validateLogin(result);
+	public void logonComplete(EnumOperatiiLogon methodName, String result) {
+		switch (methodName) {
+		case GET_COD_SOFER:
+			showNumeSofer(result);
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	@Override
+	public void onTaskComplete(String methodName, String result, EnumNetworkStatus networkStatus) {
+		Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
 
 	}
 

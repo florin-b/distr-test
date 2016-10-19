@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF"
+    android:orientation="horizontal" >
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="0.8"
+        class="com.google.android.gms.maps.MapFragment" />
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_margin="30dip"
+        android:layout_weight="0.2"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="Distanta destinatie:"
+            android:textColor="#458B00"
+            android:textSize="19sp" />
+
+        <TextView
+            android:id="@+id/textDistanta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dip"
+            android:fontFamily="serif"
+            android:textColor="#458B00"
+            android:textSize="23sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="Inchide" />
+    </RelativeLayout>
+
+</LinearLayout>

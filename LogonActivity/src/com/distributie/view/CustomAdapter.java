@@ -7,34 +7,33 @@ package com.distributie.view;
 import java.util.HashMap;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.distributie.model.InfoStrings;
-import com.example.distributie.R;
+import com.distributie.beans.InitStatus;
+import com.distributie.dialog.MapRouteDialog;
+import com.distributie.model.CurrentStatus;
 
 public class CustomAdapter extends SimpleAdapter {
 
-	Context context;
-
+	private Context context;
+	private boolean showTraseuBtn;
 	private int[] colorEvents = new int[] { 0x307FFFD4, 0x30FFD700, 0x30EE9572 };
 
 	static class ViewHolder {
-		public TextView textNrCrt, textNumeClient, textCodClient, textAdresaClient, textEv1, textTimpEv1, textEv2,
-				textTimpEv2, textCodAdresa;
+		public TextView textNrCrt, textNumeClient, textCodClient, textAdresaClient, textEv1, textTimpEv1, textEv2, textTimpEv2, textCodAdresa, btnTraseu;
 	}
 
-	public CustomAdapter(Context context, List<HashMap<String, String>> items, int resource, String[] from, int[] to) {
+	public CustomAdapter(Context context, List<HashMap<String, String>> items, int resource, String[] from, int[] to, boolean showTraseu) {
 		super(context, items, resource, from, to);
 		this.context = context;
+		this.showTraseuBtn = showTraseu;
+
 	}
 
 	@Override
@@ -60,6 +59,7 @@ public class CustomAdapter extends SimpleAdapter {
 			viewHolder.textEv2 = (TextView) view.findViewById(R.id.textEv2);
 			viewHolder.textTimpEv2 = (TextView) view.findViewById(R.id.textTimpEv2);
 			viewHolder.textCodAdresa = (TextView) view.findViewById(R.id.textCodAdresa);
+			viewHolder.btnTraseu = (TextView) view.findViewById(R.id.btnTraseu);
 
 			view.setTag(viewHolder);
 
@@ -67,7 +67,7 @@ public class CustomAdapter extends SimpleAdapter {
 
 		}
 
-		ViewHolder holder = (ViewHolder) view.getTag();
+		final ViewHolder holder = (ViewHolder) view.getTag();
 		@SuppressWarnings("unchecked")
 		HashMap<String, String> artMap = (HashMap<String, String>) this.getItem(position);
 
@@ -79,14 +79,12 @@ public class CustomAdapter extends SimpleAdapter {
 
 		tokNewVal = artMap.get("codClient");
 		holder.textCodClient.setText(tokNewVal);
-		String localSelClient = tokNewVal;
 
 		tokNewVal = artMap.get("adresaClient");
 		holder.textAdresaClient.setText(tokNewVal);
 
 		tokNewVal = artMap.get("codAdresa");
 		holder.textCodAdresa.setText(tokNewVal);
-		String localCodAdresa = tokNewVal;
 
 		tokNewVal = artMap.get("ev1");
 		holder.textEv1.setText(tokNewVal);
@@ -102,6 +100,21 @@ public class CustomAdapter extends SimpleAdapter {
 		tokNewVal = artMap.get("timpEv2");
 		holder.textTimpEv2.setText(tokNewVal);
 
+		if (!showTraseuBtn)
+			holder.btnTraseu.setVisibility(View.INVISIBLE);
+		else
+			holder.btnTraseu.setVisibility(View.VISIBLE);
+
+		
+		holder.btnTraseu.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				MapRouteDialog dialog = new MapRouteDialog(context, holder.textCodAdresa.getText().toString());
+				dialog.show();
+
+			}
+		});
+
 		if (strEvent1.trim().equals("") && strEvent2.trim().equals("")) {
 			view.setBackgroundColor(this.colorEvents[0]);
 		} else {
@@ -114,21 +127,13 @@ public class CustomAdapter extends SimpleAdapter {
 			}
 		}
 
-		/*
-		 * if (isCurrentClient(localSelClient, localCodAdresa)) {
-		 * view.setBackgroundColor
-		 * (context.getResources().getColor(R.color.rowColor8)); }
-		 */
-
-		//view.setBackgroundColor(this.context.getResources().getColor(R.color.rowColor9));
-
 		return view;
 
 	}
 
 	boolean isCurrentClient(String localSelClient, String localCodAdresa) {
-		return localSelClient.equals(InfoStrings.getCurentClient(context))
-				&& localCodAdresa.equals(InfoStrings.getCurentClientAddr(context));
+		return localSelClient.equals(CurrentStatus.getInstance().getCurrentClient())
+				&& localCodAdresa.equals(CurrentStatus.getInstance().getCurentClientAddr());
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.distributie.model;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,12 +13,16 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import com.distributie.listeners.AsyncTaskListener;
-
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.distributie.beans.EvenimentNou;
+import com.distributie.connectors.ConnectionStrings;
+import com.distributie.enums.EnumNetworkStatus;
+import com.distributie.listeners.AsyncTaskListener;
 
 public class AsyncTaskWSCall {
 
@@ -25,13 +31,18 @@ public class AsyncTaskWSCall {
 	private Context context;
 	private AsyncTaskListener contextListener;
 	private AsyncTaskListener myListener;
+	private ProgressDialog dialog;
+	private EvenimentNou eveniment;
 
-	public AsyncTaskWSCall(String methodName, HashMap<String, String> params, AsyncTaskListener myListener,
-			Context context) {
+	public AsyncTaskWSCall(String methodName, HashMap<String, String> params, AsyncTaskListener myListener, Context context) {
 		this.myListener = myListener;
 		this.methodName = methodName;
 		this.params = params;
 		this.context = context;
+
+	}
+
+	public AsyncTaskWSCall() {
 
 	}
 
@@ -45,8 +56,11 @@ public class AsyncTaskWSCall {
 		this.params = params;
 	}
 
-	public AsyncTaskWSCall(Context context, AsyncTaskListener contextListener, String methodName,
-			HashMap<String, String> params) {
+	public void setEveniment(EvenimentNou eveniment) {
+		this.eveniment = eveniment;
+	}
+
+	public AsyncTaskWSCall(Context context, AsyncTaskListener contextListener, String methodName, HashMap<String, String> params) {
 		this.context = context;
 		this.methodName = methodName;
 		this.params = params;
@@ -59,6 +73,7 @@ public class AsyncTaskWSCall {
 
 	private class WebServiceCall extends AsyncTask<Void, Void, String> {
 		String errMessage = "";
+		Exception exception = null;
 		private AsyncTaskListener myListener;
 
 		private WebServiceCall(AsyncTaskListener myListener) {
@@ -66,10 +81,19 @@ public class AsyncTaskWSCall {
 			this.myListener = myListener;
 		}
 
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(context);
+			dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			dialog.setMessage("Asteptati...");
+			dialog.setCancelable(false);
+			dialog.show();
+		}
+
 		@Override
 		protected String doInBackground(Void... url) {
 			String response = "";
 			try {
+
 				SoapObject request = new SoapObject(ConnectionStrings.getInstance().getNamespace(), methodName);
 
 				for (Entry<String, String> entry : params.entrySet()) {
@@ -80,18 +104,21 @@ public class AsyncTaskWSCall {
 				envelope.dotNet = true;
 				envelope.setOutputSoapObject(request);
 
-				HttpTransportSE androidHttpTransport = new HttpTransportSE(ConnectionStrings.getInstance().getUrl(),
-						60000);
+				HttpTransportSE androidHttpTransport = new HttpTransportSE(ConnectionStrings.getInstance().getUrl(), 60000);
 
 				List<HeaderProperty> headerList = new ArrayList<HeaderProperty>();
-				headerList.add(new HeaderProperty("Authorization", "Basic "
-						+ org.kobjects.base64.Base64.encode("bflorin:bflorin".getBytes())));
-				androidHttpTransport.call(ConnectionStrings.getInstance().getNamespace() + methodName, envelope,
-						headerList);
+				headerList.add(new HeaderProperty("Authorization", "Basic " + org.kobjects.base64.Base64.encode("bflorin:bflorin".getBytes())));
+				androidHttpTransport.call(ConnectionStrings.getInstance().getNamespace() + methodName, envelope, headerList);
 				Object result = envelope.getResponse();
 				response = result.toString();
+
+			} catch (ConnectException con) {
+				errMessage = con.toString();
+				exception = con;
+
 			} catch (Exception e) {
-				errMessage = e.getMessage();
+				exception = e;
+				errMessage = e.toString();
 			}
 			return response;
 		}
@@ -100,17 +127,52 @@ public class AsyncTaskWSCall {
 		protected void onPostExecute(String result) {
 
 			try {
-				if (!errMessage.equals("")) {
+
+				if (dialog != null) {
+					dialog.dismiss();
+					dialog = null;
+				}
+
+				EnumNetworkStatus netStat = EnumNetworkStatus.ON;
+				if (exception instanceof ConnectException) {
+					handleTimeoutConnection();
+					netStat = EnumNetworkStatus.OFF;
+				}
+
+				if (!errMessage.equals("") && !(exception instanceof ConnectException)) {
 					Toast toast = Toast.makeText(context, errMessage, Toast.LENGTH_SHORT);
 					toast.show();
+
 				} else {
-					myListener.onTaskComplete(methodName, result);
+
+					if (exception == null)
+						clearStoredObjects();
+
+					myListener.onTaskComplete(methodName, result, netStat);
 				}
 			} catch (Exception e) {
 				Log.e("Error", e.toString());
 			}
 		}
 
+	}
+
+	private void handleTimeoutConnection() {
+
+		LocalStorage storage = new LocalStorage(context);
+		try {
+			storage.serObject(eveniment);
+			myListener.onTaskComplete(methodName, "", EnumNetworkStatus.OFF);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void clearStoredObjects() {
+		LocalStorage storage = new LocalStorage(context);
+		storage.deleteAllObjects();
 	}
 
 	public void getCallResults2() {
@@ -142,14 +204,11 @@ public class AsyncTaskWSCall {
 				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
 				envelope.dotNet = true;
 				envelope.setOutputSoapObject(request);
-				HttpTransportSE androidHttpTransport = new HttpTransportSE(ConnectionStrings.getInstance().getUrl(),
-						60000);
+				HttpTransportSE androidHttpTransport = new HttpTransportSE(ConnectionStrings.getInstance().getUrl(), 60000);
 
 				List<HeaderProperty> headerList = new ArrayList<HeaderProperty>();
-				headerList.add(new HeaderProperty("Authorization", "Basic "
-						+ org.kobjects.base64.Base64.encode("bflorin:bflorin".getBytes())));
-				androidHttpTransport.call(ConnectionStrings.getInstance().getNamespace() + methodName, envelope,
-						headerList);
+				headerList.add(new HeaderProperty("Authorization", "Basic " + org.kobjects.base64.Base64.encode("bflorin:bflorin".getBytes())));
+				androidHttpTransport.call(ConnectionStrings.getInstance().getNamespace() + methodName, envelope, headerList);
 				Object result = envelope.getResponse();
 				response = result.toString();
 			} catch (Exception e) {
@@ -165,7 +224,7 @@ public class AsyncTaskWSCall {
 					Toast toast = Toast.makeText(context, errMessage, Toast.LENGTH_SHORT);
 					toast.show();
 				} else {
-					listener.onTaskComplete(methodName, result);
+					listener.onTaskComplete(methodName, result, EnumNetworkStatus.ON);
 
 				}
 			} catch (Exception e) {

@@ -10,61 +10,38 @@
     android:orientation="horizontal" >
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
         android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_marginLeft="100dip"
-        android:layout_weight="0.1"
+        android:layout_weight="0.15"
         android:orientation="vertical" >
 
-       
+        <TextView
+            style="@style/ShadowText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center"
+            android:gravity="left|center"
+            android:maxLength="20"
+            android:singleLine="true"
+            android:text="@string/logon_name"
+            android:textColor="#F2B80A"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:typeface="serif" />
 
-            <TextView
-                style="@style/ShadowText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|center"
-                android:gravity="left|center"
-                android:maxLength="20"
-                android:singleLine="true"
-                android:text="@string/logon_name"
-                android:textColor="#F2B80A"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:typeface="serif"
-                android:drawableRight="@drawable/truck_icon" 
-                />
-
-            
-        
-
-        <EditText
-            android:id="@+id/txtUserName"
+        <TextView
+            android:id="@+id/txtNumeSofer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left|bottom"
-            android:layout_marginTop="0dip"
+            android:layout_marginTop="20dip"
             android:gravity="left"
-            android:inputType="text"
-            android:maxLength="20"
             android:singleLine="true"
             android:textColor="#36648B"
-            android:textSize="22sp"
-            android:typeface="monospace" />
-
-        <EditText
-            android:id="@+id/txtPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left|bottom"
-            android:gravity="left"
-            android:inputType="textPassword"
-            android:maxLength="20"
-            android:singleLine="true"
-            android:textColor="#36648B"
-            android:textSize="22sp"
-            android:typeface="monospace" />
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:typeface="serif" />
 
         <ProgressBar
             android:id="@+id/progress_bar_wheel"
@@ -83,17 +60,17 @@
     </View>
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1" >
+        android:layout_weight="0.15" >
 
-        <com.distributie.view.RotaryKnobView
-            android:id="@+id/jogView"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center" />
+        <ImageView
+            android:id="@+id/logonImage"
+            android:layout_width="200dip"
+            android:layout_height="200dip"
+            android:src="@drawable/steering_wheel" />
     </LinearLayout>
+
+  
 
 </LinearLayout>

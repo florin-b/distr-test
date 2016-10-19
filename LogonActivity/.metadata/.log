@@ -12,3 +12,35 @@ user global configuration and to define the default location to store repositori
 not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
 EGit might behave differently since they see different configuration options.
 This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2016-05-23 14:50:29.325 -----------------------------------------------
+eclipse.buildId=M20120914-1800
+java.version=1.7.0_11
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY org.eclipse.ui 4 4 2016-05-23 14:50:42.921
+!MESSAGE Unable to find Action Set: com.instantiations.assist.eclipse.codeproMenu
+
+!ENTRY org.eclipse.ui 4 4 2016-05-23 14:50:42.940
+!MESSAGE Unable to find Action Set: com.instantiations.assist.eclipse.codeproMenu.dependency
+
+!ENTRY org.eclipse.ui 4 4 2016-05-23 14:50:42.941
+!MESSAGE Unable to find Action Set: com.instantiations.assist.eclipse.codeproMenu.audit
+
+!ENTRY org.eclipse.ui 4 4 2016-05-23 14:50:42.941
+!MESSAGE Unable to find Action Set: com.instantiations.assist.eclipse.codeproMenu.doc
+
+!ENTRY org.eclipse.ui 4 4 2016-05-23 14:50:42.942
+!MESSAGE Unable to find Action Set: com.instantiations.eclipse.analysis.similarcode.ui.ActionSet
+
+!ENTRY org.eclipse.ui 4 4 2016-05-23 14:50:42.943
+!MESSAGE Unable to find Action Set: com.instantiations.assist.eclipse.codeproMenu.test
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-05-23 14:50:45.491
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\user'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="30dip"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/textNrCrt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="10dip"
+            android:layout_marginTop="10dip"
+            android:layout_weight="0.02"
+            android:gravity="left"
+            android:textColor="#666666"
+            android:textSize="25sp"
+            android:typeface="monospace" />
+
+        <TextView
+            android:id="@+id/textNumeEtapa"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dip"
+            android:layout_weight="0.5"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+
+        <TextView
+            android:id="@+id/textDocument"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="20dip"
+            android:layout_weight="0.2"
+            android:gravity="right"
+            android:textColor="#0000CD"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dip"
+            android:layout_weight="0.02" />
+
+        <TextView
+            android:id="@+id/textDescEtapa"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dip"
+            android:layout_weight="0.40"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:typeface="monospace" />
+
+        <TextView
+            android:id="@+id/textDescPozitie"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dip"
+            android:layout_weight="0.45"
+            android:gravity="left"
+            android:text="Ordine descarcare"
+            android:textColor="#CD5B45"
+            android:textSize="25sp"
+            android:typeface="sans" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="20dip"
+        android:orientation="horizontal" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dip"
+            android:layout_weight="0.02" />
+
+        <ImageView
+            android:id="@+id/checkedIcon"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="10dip"
+            android:layout_weight="0.2"
+            android:contentDescription="Checked"
+            android:gravity="left"
+            android:src="@drawable/check_icon"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnSalvareEveniment"
+            style="@style/save_button"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="0.2"
+            android:background="@drawable/cancel_button_style"
+            android:paddingBottom="15dip"
+            android:paddingLeft="30dip"
+            android:paddingRight="30dip"
+            android:paddingTop="10dip"
+            android:text="SOSIRE" />
+
+        <View
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.17" />
+
+        <TextView
+            android:id="@+id/textPozitie"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="0.05"
+            android:gravity="top|center_horizontal"
+            android:textColor="#CD5B45"
+            android:textSize="60sp"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+
+        <ImageView
+            android:id="@+id/clearIcon"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dip"
+            android:layout_weight="0.1"
+            android:contentDescription="Clear selection"
+            android:src="@drawable/delete_icon" />
+
+        <View
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05" />
+
+        <Button
+            android:id="@+id/btnAnulareEveniment"
+            style="@style/cancel_button"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="20dip"
+            android:layout_weight="0.2"
+            android:background="@drawable/cancel_button_style"
+            android:paddingBottom="15dip"
+            android:paddingLeft="30dip"
+            android:paddingRight="30dip"
+            android:paddingTop="15dip"
+            android:text="Anuleaza"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+</LinearLayout>

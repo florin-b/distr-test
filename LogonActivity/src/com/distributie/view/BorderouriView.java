@@ -7,46 +7,57 @@ package com.distributie.view;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+
+import com.distributie.beans.BeanAlarma;
+import com.distributie.beans.BeanClientAlarma;
+import com.distributie.beans.BeanEvenimentStop;
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Eveniment;
+import com.distributie.dialog.SugestieEvenimentDialog;
+import com.distributie.enums.EnumMotivOprire;
+import com.distributie.enums.EnumNetworkStatus;
+import com.distributie.enums.EnumOperatiiBorderou;
+import com.distributie.enums.EnumOperatiiEvenimente;
+import com.distributie.enums.EnumTipAlarma;
+import com.distributie.enums.TipBorderou;
 import com.distributie.listeners.BorderouriDAOListener;
 import com.distributie.listeners.CustomSpinnerListener;
+import com.distributie.listeners.EvenimentDialogListener;
 import com.distributie.listeners.OperatiiBorderouriListener;
+import com.distributie.listeners.OperatiiEvenimenteListener;
 import com.distributie.model.BorderouriDAOImpl;
-import com.distributie.model.OperatiiBorderouriDAOImpl;
+import com.distributie.model.CurrentStatus;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.InfoStrings;
+import com.distributie.model.OperatiiBorderouriDAOImpl;
+import com.distributie.model.OperatiiEvenimente;
 import com.distributie.model.UserInfo;
 import com.distributie.model.Utils;
-import com.example.distributie.R;
 
-public class Evenimente extends Activity implements CustomSpinnerListener, BorderouriDAOListener, OperatiiBorderouriListener {
-
-	@InjectView(R.id.saveEvent)
-	Button eventButton;
+public class BorderouriView extends Activity implements CustomSpinnerListener, BorderouriDAOListener, OperatiiBorderouriListener, OperatiiEvenimenteListener,
+		EvenimentDialogListener {
 
 	@InjectView(R.id.showDetBordBtn)
 	Button showDetBtn;
@@ -57,9 +68,6 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 	@InjectView(R.id.spinnerBorderouri)
 	Spinner spinnerBorderouri;
 
-	@InjectView(R.id.pw_spinner)
-	ProgressWheel pw;
-
 	@InjectView(R.id.layoutOutEvent)
 	LinearLayout layoutEventOut;
 
@@ -68,6 +76,9 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 
 	@InjectView(R.id.layoutTotalTrip)
 	LinearLayout layoutTotalTrip;
+
+	@InjectView(R.id.layoutBorderouri)
+	LinearLayout layoutBorderouri;
 
 	@InjectView(R.id.layoutDetBtn)
 	LinearLayout layoutDetButton;
@@ -96,6 +107,9 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 	@InjectView(R.id.textTripDistance)
 	TextView textTripDistance;
 
+	@InjectView(R.id.layoutNoBord)
+	RelativeLayout layoutNoBord;
+
 	private Timer myEventTimer;
 	private int progressVal = 0;
 	private Handler eventHandler = new Handler();
@@ -104,6 +118,19 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 	private static ArrayList<HashMap<String, String>> listBorderouri = new ArrayList<HashMap<String, String>>();
 
 	CustomSpinnerClass spinnerClass = new CustomSpinnerClass();
+	private OperatiiBorderouriDAOImpl newEvent;
+
+	private Timer timer;
+	private TimerTask timerTask;
+	private Handler handler = new Handler();
+	private OperatiiEvenimente opEvenimente;
+	private Button eventButton, saveIncarcareButton;
+
+	private enum EnumTipEveniment {
+		SFARSIT_INCARCARE, START_STOP_BORDDEROU;
+	}
+
+	private EnumTipEveniment evenimentBorderou;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -113,8 +140,90 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 		setContentView(R.layout.evenimente);
 		ButterKnife.inject(this);
 
+		newEvent = new OperatiiBorderouriDAOImpl(this);
+		newEvent.setEventListener(this);
+
+		opEvenimente = new OperatiiEvenimente(this);
+		opEvenimente.setOperatiiEvenimenteListener(this);
+
 		InitialUISetup();
 
+		startTimerTask();
+
+	}
+
+	private void startTimerTask() {
+
+		timer = new Timer();
+		initializeTimerTask();
+		timer.schedule(timerTask, 300000, 300000);
+
+	}
+
+	public void stopTimerTask() {
+
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
+	}
+
+	public void initializeTimerTask() {
+
+		timerTask = new TimerTask() {
+			public void run() {
+				handler.post(new Runnable() {
+					public void run() {
+						getEvenimente();
+
+					}
+				});
+			}
+		};
+	}
+
+	private void getEvenimente() {
+
+		if (CurrentStatus.getInstance().getNrBorderou() != null) {
+
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("codBorderou", CurrentStatus.getInstance().getNrBorderou());
+
+			opEvenimente.getEvenimentStop(params);
+		}
+	}
+
+	private void incarcaEvenimente(BeanEvenimentStop evenimentStop) {
+
+		if (!evenimentStop.isEvenimentSalvat()) {
+			List<BeanAlarma> listEv = new ArrayList<BeanAlarma>();
+
+			for (BeanClientAlarma client : evenimentStop.getClientiAlarma()) {
+				BeanAlarma b = new BeanAlarma();
+				b.setTipAlarma(EnumTipAlarma.CLIENT);
+				b.setNumeAlarma("Sosire " + client.getNume());
+				b.setCodAlarma(client.getCodClient());
+				b.setCodAdresa(client.getCodAdresa());
+				listEv.add(b);
+			}
+
+			for (EnumMotivOprire motiv : EnumMotivOprire.values()) {
+
+				BeanAlarma b = new BeanAlarma();
+				b.setTipAlarma(EnumTipAlarma.EVENIMENT);
+				b.setNumeAlarma(motiv.getNume());
+				b.setCodAlarma(String.valueOf(motiv.getCod()));
+				b.setIdEveniment(evenimentStop.getIdEveniment());
+				listEv.add(b);
+			}
+
+			stopTimerTask();
+
+			SugestieEvenimentDialog sugestie = new SugestieEvenimentDialog(BorderouriView.this, listEv);
+			sugestie.setEvenimentDialogListener(this);
+			sugestie.show();
+
+		}
 	}
 
 	private void InitialUISetup() {
@@ -140,45 +249,39 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 			textTripTime.setText("");
 			textTripDistance.setText("");
 
+			eventButton = (Button) findViewById(R.id.saveEvent);
+			eventButton.setVisibility(View.GONE);
 			eventButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.out1, 0, 0, 0);
 			eventButton.setText("\t\tStart borderou");
-			eventButton.setVisibility(View.INVISIBLE);
 			eventButton.setOnTouchListener(new myEventBtnOnTouchListener());
+
+			saveIncarcareButton = (Button) findViewById(R.id.saveIncarcare);
+			saveIncarcareButton.setText("Sfarsit incarcare");
+			saveIncarcareButton.setOnTouchListener(new myEventBtnOnTouchListener());
+			saveIncarcareButton.setVisibility(View.GONE);
 
 			layoutDetButton.setVisibility(View.GONE);
 
 			showDetBtn.setVisibility(View.VISIBLE);
 
-			pw.setVisibility(View.INVISIBLE);
-
-			adapterBorderouri = new BorderouriAdapter(this, listBorderouri, R.layout.custom_row_list_borderouri,
-					new String[] { "nrCrt", "codBorderou", "dataBorderou", "tipBorderou", "eveniment" }, new int[] {
-							R.id.textNrCrt, R.id.textCodBorderou, R.id.textDataBorderou, R.id.textTipBorderou,
-							R.id.textEvenimentBorderou });
+			adapterBorderouri = new BorderouriAdapter(this, listBorderouri, R.layout.custom_row_list_borderouri, new String[] { "nrCrt", "codBorderou",
+					"dataBorderou", "tipBorderou", "eveniment" }, new int[] { R.id.textNrCrt, R.id.textCodBorderou, R.id.textDataBorderou,
+					R.id.textTipBorderou, R.id.textEvenimentBorderou });
 
 			spinnerBorderouri.setAdapter(adapterBorderouri);
 			spinnerBorderouri.setOnItemSelectedListener(spinnerClass);
+
 			spinnerClass.setListener(this);
+
+			layoutBorderouri.setVisibility(View.INVISIBLE);
+			layoutNoBord.setVisibility(View.GONE);
 
 			performIncarcaBorderouri();
 
 		} catch (Exception ex) {
-			Toast.makeText(Evenimente.this, ex.toString(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(BorderouriView.this, ex.toString(), Toast.LENGTH_SHORT).show();
 		}
 
-	}
-
-	private void startSpinner() {
-		pw.setVisibility(View.VISIBLE);
-		eventButton.setEnabled(false);
-		pw.spin();
-
-	}
-
-	private void stopSpinner() {
-		pw.setVisibility(View.INVISIBLE);
-		pw.stopSpinning();
-		eventButton.setEnabled(true);
 	}
 
 	@Override
@@ -207,16 +310,11 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 				switch (event.getAction()) {
 				case MotionEvent.ACTION_DOWN:
 
-					if (!InfoStrings.isGPSEnabled(v.getContext())) {
-						InfoStrings.showGPSDisabledAlert(v.getContext());
-					} else {
-
-						progressBarEvent.setVisibility(View.VISIBLE);
-						progressBarEvent.setProgress(0);
-						progressVal = 0;
-						myEventTimer = new Timer();
-						myEventTimer.schedule(new UpdateProgress(), 40, 25);
-					}
+					progressBarEvent.setVisibility(View.VISIBLE);
+					progressBarEvent.setProgress(0);
+					progressVal = 0;
+					myEventTimer = new Timer();
+					myEventTimer.schedule(new UpdateProgress(), 35, 15);
 
 					return true;
 
@@ -224,6 +322,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 					if (progressBarEvent.getVisibility() == View.VISIBLE) {
 
 						myEventTimer.cancel();
+						myEventTimer = null;
 						progressBarEvent.setVisibility(View.INVISIBLE);
 						return true;
 					}
@@ -240,26 +339,25 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 
 	@OnClick(R.id.showDetBordBtn)
 	public void myDetBtnOnClickListener() {
-		Intent nextScreen = new Intent(Evenimente.this, Livrare.class);
+		Intent nextScreen = new Intent(BorderouriView.this, Livrare.class);
 		startActivity(nextScreen);
-
 		finish();
 	}
 
 	class UpdateProgress extends TimerTask {
 		public void run() {
 			progressVal++;
-			if (50 == progressBarEvent.getProgress()) {
+			if (progressBarEvent.getProgress() == 50) {
+				myEventTimer.cancel();
+				myEventTimer = null;
 				eventHandler.post(new Runnable() {
 					public void run() {
-
 						progressBarEvent.setVisibility(View.INVISIBLE);
-						performSaveNewEvent();
 
+						performAction();
 					}
 				});
 
-				myEventTimer.cancel();
 			} else {
 				progressBarEvent.setProgress(progressVal);
 
@@ -268,25 +366,59 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 		}
 	}
 
-	private void performSaveNewEvent() {
+	@Override
+	public void finish() {
+		stopTimerTask();
+		super.finish();
+	}
+
+	private void performAction() {
+
+		if (evenimentBorderou == EnumTipEveniment.START_STOP_BORDDEROU) {
+			eventButton.setEnabled(false);
+			saveStartStopEvent();
+		} else if (evenimentBorderou == EnumTipEveniment.SFARSIT_INCARCARE) {
+			saveIncarcareButton.setEnabled(false);
+			setSfarsitIncarcareBorderou();
+		}
+
+	}
+
+	private void getSfarsitIncarcareBorderou() {
+
+		if (CurrentStatus.getInstance().getNrBorderou() != "") {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("document", CurrentStatus.getInstance().getNrBorderou());
+			params.put("codSofer", UserInfo.getInstance().getId());
+			opEvenimente.getSfarsitIncarcare(params);
+		}
+
+	}
+
+	private void setSfarsitIncarcareBorderou() {
+
+		if (CurrentStatus.getInstance().getNrBorderou() != "") {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("document", CurrentStatus.getInstance().getNrBorderou());
+			params.put("codSofer", UserInfo.getInstance().getId());
+			opEvenimente.setSfarsitIncarcare(params);
+		}
+
+	}
+
+	private void saveStartStopEvent() {
 
 		try {
 
-			startSpinner();
-
-			String localStrDocNr = InfoStrings.getNrBorderou(Evenimente.this);
-
+			String localStrDocNr = CurrentStatus.getInstance().getNrBorderou();
 			HashMap<String, String> newEventData = new HashMap<String, String>();
 			newEventData.put("codSofer", UserInfo.getInstance().getId());
 			newEventData.put("document", localStrDocNr);
 			newEventData.put("client", localStrDocNr);
 			newEventData.put("codAdresa", " ");
-			newEventData.put("eveniment", InfoStrings.getEveniment(Evenimente.this));
-			newEventData.put("truckData", getTruckServiceData());
+			newEventData.put("eveniment", CurrentStatus.getInstance().getEveniment());
 
-			OperatiiBorderouriDAOImpl newEvent = new OperatiiBorderouriDAOImpl(this);
-			newEvent.setEventListener(this);
-			newEvent.saveNewEventBorderou(newEventData);
+			newEvent.saveNewEventBorderou(newEventData, null);
 
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
@@ -297,9 +429,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 	public void performIncarcaBorderouri() {
 		try {
 
-			startSpinner();
-
-			BorderouriDAOImpl bord = new BorderouriDAOImpl(this);
+			BorderouriDAOImpl bord = BorderouriDAOImpl.getInstance(this);
 			bord.setBorderouEventListener(this);
 			bord.getBorderouri(UserInfo.getInstance().getId(), "d", "-1");
 
@@ -315,8 +445,13 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 
 		if (borderouriArray.size() > 0) {
 
+			if (evenimentBorderou == EnumTipEveniment.START_STOP_BORDDEROU)
+				setBordDetVisibility(true);
+
 			listBorderouri.clear();
 			int selectedPosition = -1;
+			layoutBorderouri.setVisibility(View.VISIBLE);
+			layoutNoBord.setVisibility(View.GONE);
 			spinnerBorderouri.setEnabled(true);
 
 			HashMap<String, String> temp;
@@ -327,7 +462,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 				temp.put("nrCrt", String.valueOf(i + 1) + ".");
 				temp.put("codBorderou", borderouriArray.get(i).getNumarBorderou());
 				temp.put("dataBorderou", borderouriArray.get(i).getDataEmiterii());
-				temp.put("tipBorderou", InfoStrings.getStringTipBorderou(borderouriArray.get(i).getTipBorderou()));
+				temp.put("tipBorderou", InfoStrings.getStringTipBorderou(borderouriArray.get(i).getTipBorderou()).toString());
 				temp.put("eveniment", borderouriArray.get(i).getEvenimentBorderou());
 
 				if (selectedPosition == -1) {
@@ -363,47 +498,29 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 			layoutEventOut.setVisibility(View.INVISIBLE);
 			layoutEventIn.setVisibility(View.INVISIBLE);
 
-			Toast.makeText(getApplicationContext(), "Nu exista borderouri!", Toast.LENGTH_LONG).show();
+			layoutBorderouri.setVisibility(View.GONE);
+			layoutNoBord.setVisibility(View.VISIBLE);
+
 		}
 
 	}
 
-	private String getTruckServiceData() {
-		String truckParams = "0@0";
+	private void setBordDetVisibility(boolean isVisible) {
 
-		try {
-			Context con;
-			SharedPreferences pref;
+		if (isVisible) {
+			layoutDetButton.setVisibility(View.VISIBLE);
 
-			con = createPackageContext("com.android.dataservice", 0);
-			pref = con.getSharedPreferences("TRUCK_DATA", Context.MODE_MULTI_PROCESS);
-
-			truckParams = pref.getString("params", "0@0");
-
-		} catch (Exception ex) {
-			truckParams = "0@0";
-			Log.e("Error", ex.toString());
+			layoutEventOut.setVisibility(View.VISIBLE);
+			textDateEventOut.setVisibility(View.VISIBLE);
+			textTimeEventOut.setVisibility(View.VISIBLE);
+			textKmEventOut.setVisibility(View.VISIBLE);
+			showDetBtn.setVisibility(View.VISIBLE);
 		}
-
-		return truckParams;
 
 	}
 
-	public void performGetBorderouEvents() {
-
-		try {
-			startSpinner();
-
-			OperatiiBorderouriDAOImpl eventsDAO = new OperatiiBorderouriDAOImpl(this);
-			eventsDAO.setEventListener(this);
-			eventsDAO.getDocEvents(InfoStrings.getNrBorderou(getApplicationContext()), "0");
-
-		} catch (Exception ex) {
-
-			Toast.makeText(getBaseContext(), ex.toString(), Toast.LENGTH_LONG).show();
-
-		}
-
+	public void getStartStopBorderou() {
+		newEvent.getDocEvents(CurrentStatus.getInstance().getNrBorderou(), "0");
 	}
 
 	private void populateEventsList(String eventsData) {
@@ -427,8 +544,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 
 						textDateEventOut.setText(evenimenteArray.get(i).getData());
 
-						textTimeEventOut.setText(evenimenteArray.get(i).getOra().substring(0, 2) + ":"
-								+ evenimenteArray.get(i).getOra().substring(2, 4) + ":"
+						textTimeEventOut.setText(evenimenteArray.get(i).getOra().substring(0, 2) + ":" + evenimenteArray.get(i).getOra().substring(2, 4) + ":"
 								+ evenimenteArray.get(i).getOra().substring(4, 6));
 						textKmEventOut.setText(evenimenteArray.get(i).getDistantaKM());
 						layoutEventOut.setVisibility(View.VISIBLE);
@@ -443,8 +559,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 					if (evenimenteArray.get(i).getEveniment().equals("S")) {
 
 						textDateEventIn.setText(evenimenteArray.get(i).getData());
-						textTimeEventIn.setText(evenimenteArray.get(i).getOra().substring(0, 2) + ":"
-								+ evenimenteArray.get(i).getOra().substring(2, 4) + ":"
+						textTimeEventIn.setText(evenimenteArray.get(i).getOra().substring(0, 2) + ":" + evenimenteArray.get(i).getOra().substring(2, 4) + ":"
 								+ evenimenteArray.get(i).getOra().substring(4, 6));
 						textKmEventIn.setText(evenimenteArray.get(i).getDistantaKM());
 
@@ -454,8 +569,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 
 						layoutTotalTrip.setVisibility(View.VISIBLE);
 
-						textTripTime.setText(getTripTime(textDateEventOut.getText().toString(), textDateEventIn
-								.getText().toString()));
+						textTripTime.setText(getTripTime(textDateEventOut.getText().toString(), textDateEventIn.getText().toString()));
 
 						double startDistance = Double.valueOf(textKmEventOut.getText().toString());
 						double stopDistance = Double.valueOf(textKmEventIn.getText().toString());
@@ -483,7 +597,7 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 			}
 
 		} catch (Exception ex) {
-			Toast.makeText(Evenimente.this, ex.toString(), Toast.LENGTH_LONG).show();
+			Toast.makeText(BorderouriView.this, ex.toString(), Toast.LENGTH_LONG).show();
 		}
 
 	}
@@ -529,39 +643,88 @@ public class Evenimente extends Activity implements CustomSpinnerListener, Borde
 	@Override
 	public void onSelectedSpinnerItem(int spinnerId, HashMap<String, String> map) {
 		if (spinnerId == R.id.spinnerBorderouri) {
-			InfoStrings.setNrBorderou(getApplicationContext(), map.get("codBorderou"));
-			InfoStrings.setEveniment(getApplicationContext(), map.get("eveniment"));
-			InfoStrings.setTipBorderou(getApplicationContext(), map.get("tipBorderou"));
 
-			performGetBorderouEvents();
+			CurrentStatus.getInstance().setNrBorderou(map.get("codBorderou"));
+			CurrentStatus.getInstance().setEveniment(map.get("eveniment"));
+			CurrentStatus.getInstance().setTipBorderou(TipBorderou.valueOf(map.get("tipBorderou")));
+
+			getSfarsitIncarcareBorderou();
 
 		}
 
 	}
 
-	@Override
-	public void loadComplete(String result, String methodName) {
-		stopSpinner();
-		populateListBorderouri(result);
+	private void handleSfarsitIncarcareEvent(String result) {
+
+		if (!result.equals("-1") && (result.contains("#") || result.equals("1"))) {
+			eventButton.setVisibility(View.VISIBLE);
+			eventButton.setEnabled(true);
+			saveIncarcareButton.setVisibility(View.GONE);
+			evenimentBorderou = EnumTipEveniment.START_STOP_BORDDEROU;
+			spinnerBorderouri.setEnabled(false);
+			getStartStopBorderou();
+		} else {
+			eventButton.setVisibility(View.GONE);
+			saveIncarcareButton.setVisibility(View.VISIBLE);
+			saveIncarcareButton.setEnabled(true);
+			evenimentBorderou = EnumTipEveniment.SFARSIT_INCARCARE;
+
+		}
+
+	}
+
+	public void loadComplete(String result, EnumOperatiiBorderou methodName) {
+		switch (methodName) {
+		case GET_BORDEROURI:
+			populateListBorderouri(result);
+			break;
+		default:
+			break;
+		}
 
 	}
 
 	@Override
-	public void eventComplete(String result, String methodName) {
-		stopSpinner();
-		if (methodName.equals("getDocEvents")) {
+	public void eventComplete(String result, EnumOperatiiEvenimente methodName, EnumNetworkStatus networkStatus) {
+
+		switch (methodName) {
+		case GET_DOC_EVENTS:
 			populateEventsList(result);
-		}
-
-		if (methodName.equals("saveNewEvent")) {
-			stopSpinner();
+			break;
+		case SAVE_NEW_EVENT:
 
 			performIncarcaBorderouri();
 
-			if (InfoStrings.getEveniment(Evenimente.this).equals("S")) {
-				InfoStrings.setNrBorderou(Evenimente.this, "0");
+			if (CurrentStatus.getInstance().getEveniment().equals("S")) {
+				CurrentStatus.getInstance().setNrBorderou("0");
 			}
+			break;
+		default:
+			break;
+
 		}
+
+	}
+
+	@Override
+	public void opEventComplete(String result, EnumOperatiiEvenimente methodName) {
+		switch (methodName) {
+		case CHECK_STOP:
+			incarcaEvenimente(opEvenimente.deserializeEvenimentStop(result));
+			break;
+		case SET_SFARSIT_INC:
+		case GET_SFARSIT_INC:
+			handleSfarsitIncarcareEvent(result);
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	@Override
+	public void evenimentDialogProduced() {
+		startTimerTask();
 
 	}
 
