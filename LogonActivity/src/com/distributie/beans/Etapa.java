@@ -16,6 +16,7 @@ public class Etapa implements Comparable<Etapa> {
 	private TipBorderou tipBorderou;
 	private String observatii = "";
 	private String pozitie;
+	private boolean etapaNoua;
 
 	public Etapa() {
 
@@ -40,7 +41,12 @@ public class Etapa implements Comparable<Etapa> {
 	public String getNume() {
 
 		if (tipBorderou == TipBorderou.DISTRIBUTIE) {
-			return factura.getNumeClient() + " - " + getObservatii();
+			if (tipEtapa == EnumTipEtapa.SFARSIT_INCARCARE)
+				return "Sfarsit incarcare".toUpperCase();
+			else if (tipEtapa == EnumTipEtapa.START_BORD)
+				return "Inceput cursa".toUpperCase();
+			else
+				return factura.getNumeClient() + " - " + getObservatii();
 		} else if (tipBorderou == TipBorderou.APROVIZIONARE || tipBorderou == TipBorderou.INCHIRIERE || tipBorderou == TipBorderou.SERVICE) {
 			return factura.getNumeFurnizor() + " - " + getObservatii();
 		}
@@ -158,6 +164,14 @@ public class Etapa implements Comparable<Etapa> {
 		this.pozitie = pozitie;
 	}
 
+	public boolean isEtapaNoua() {
+		return etapaNoua;
+	}
+
+	public void setEtapaNoua(boolean etapaNoua) {
+		this.etapaNoua = etapaNoua;
+	}
+
 	@Override
 	public int compareTo(Etapa arg0) {
 
@@ -165,6 +179,13 @@ public class Etapa implements Comparable<Etapa> {
 			return 0;
 		else
 			return Integer.valueOf(this.getPozitie()) - Integer.valueOf(arg0.getPozitie());
+	}
+
+	@Override
+	public String toString() {
+		return "Etapa [cod=" + cod + ", nume=" + nume + ", descriere=" + descriere + ", document=" + document + ", pos=" + pos + ", tipEtapa=" + tipEtapa
+				+ ", salvata=" + salvata + ", factura=" + factura + ", tipBorderou=" + tipBorderou + ", observatii=" + observatii + ", pozitie=" + pozitie
+				+ "]";
 	}
 
 }

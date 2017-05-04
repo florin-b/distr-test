@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
+import com.distributie.listeners.InfoDialogListener;
 import com.distributie.view.R;
 
 public class CustomInfoDialog extends Dialog {
@@ -14,6 +14,7 @@ public class CustomInfoDialog extends Dialog {
 	private TextView textAlert;
 	private Button btnOk;
 	private String alertText;
+	private InfoDialogListener infoListener;
 
 	public CustomInfoDialog(Context context) {
 		super(context);
@@ -37,6 +38,10 @@ public class CustomInfoDialog extends Dialog {
 
 	}
 
+	public void setInfoDialogListener(InfoDialogListener infoListener) {
+		this.infoListener = infoListener;
+	}
+
 	@Override
 	public void show() {
 		textAlert.setText(alertText);
@@ -48,6 +53,9 @@ public class CustomInfoDialog extends Dialog {
 
 			@Override
 			public void onClick(View arg0) {
+				if (infoListener != null)
+					infoListener.infoDialogTextRead();
+
 				dismiss();
 
 			}

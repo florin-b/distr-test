@@ -13,7 +13,7 @@
         android:layout_width="0dip"
         android:layout_height="match_parent"
         android:layout_marginLeft="100dip"
-        android:layout_weight="0.15"
+        android:layout_weight="0.2"
         android:orientation="vertical" >
 
         <TextView
@@ -29,6 +29,14 @@
             android:textSize="28sp"
             android:textStyle="bold"
             android:typeface="serif" />
+
+        <Spinner
+            android:id="@+id/spinnerSoferi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="10dip" />
 
         <TextView
             android:id="@+id/txtNumeSofer"
@@ -70,7 +78,5 @@
             android:layout_height="200dip"
             android:src="@drawable/steering_wheel" />
     </LinearLayout>
-
-  
 
 </LinearLayout>

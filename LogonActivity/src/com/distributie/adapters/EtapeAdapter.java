@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Etapa;
 import com.distributie.beans.EvenimentNou;
+import com.distributie.dialog.ArticoleEtapaDialog;
 import com.distributie.dialog.CustomAlertDialog;
 import com.distributie.dialog.CustomInfoDialog;
 import com.distributie.dialog.PozitieLivrareDialog;
@@ -26,9 +27,11 @@ import com.distributie.enums.EnumNetworkStatus;
 import com.distributie.enums.EnumOpConfirm;
 import com.distributie.enums.EnumOperatiiEvenimente;
 import com.distributie.enums.EnumTipEtapa;
+import com.distributie.enums.TipBorderou;
 import com.distributie.enums.TipEveniment;
 import com.distributie.helpers.BorderouriHelper;
 import com.distributie.listeners.AlertDialogListener;
+import com.distributie.listeners.ArticoleEtapaListener;
 import com.distributie.listeners.BorderouriListener;
 import com.distributie.listeners.OperatiiBorderouriListener;
 import com.distributie.listeners.OperatiiEtapeListener;
@@ -39,11 +42,13 @@ import com.distributie.model.OperatiiEvenimente;
 import com.distributie.model.UserInfo;
 import com.distributie.utils.Constants;
 import com.distributie.utils.DateUtils;
+import com.distributie.utils.HelperEtape;
 import com.distributie.utils.MapUtils;
 import com.distributie.view.R;
 import com.google.android.gms.maps.model.LatLng;
 
-public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListener, OperatiiBorderouriListener, AlertDialogListener, PozitieLivrareListener {
+public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListener, OperatiiBorderouriListener, AlertDialogListener, PozitieLivrareListener,
+		ArticoleEtapaListener {
 
 	private List<Etapa> listEtape;
 	private Context context;
@@ -59,6 +64,7 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 	private PozitieLivrareDialog pozitieLivrareDialog;
 	private List<String> pozitiiDisponibile;
 	private Borderou borderou;
+	private ArticoleEtapaListener articoleListener;
 
 	public EtapeAdapter(Context context, List<Etapa> listEtape) {
 		this.context = context;
@@ -88,7 +94,7 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 
 	static class ViewHolder {
 		public TextView textNrCrt, textNumeEtapa, textDescEtapa, textDocument;
-		public Button btnSalvareEveniment, btnAnulareEveniment;
+		public Button btnSalvareEveniment, btnAnulareEveniment, btnArticole;
 		public ImageView checkedIcon, clearIcon;
 		public TextView textPozitie, textDescPozitie;
 
@@ -121,6 +127,7 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 			viewHolder.textPozitie = (TextView) convertView.findViewById(R.id.textPozitie);
 			viewHolder.clearIcon = (ImageView) convertView.findViewById(R.id.clearIcon);
 			viewHolder.textDescPozitie = (TextView) convertView.findViewById(R.id.textDescPozitie);
+			viewHolder.btnArticole = (Button) convertView.findViewById(R.id.btnArticole);
 
 			convertView.setTag(viewHolder);
 
@@ -130,13 +137,7 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 
 		final Etapa etapa = getItem(position);
 
-		if (!etapa.getNume().contains("SFARSIT") && !etapa.getNume().contains("INCEPUT")) {
-			viewHolder.btnSalvareEveniment.setText("SOSIRE");
-		} else {
-			viewHolder.btnSalvareEveniment.setText(etapa.getNume());
-		}
-
-		setPozitieLivrareVisibility(viewHolder, etapa);
+		viewHolder.btnSalvareEveniment.setText(HelperEtape.getNumeEveniment(etapa));
 
 		currentView = viewHolder;
 		currentPosition = position;
@@ -148,6 +149,9 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 
 		viewHolder.textDocument.setText("Nr. borderou " + etapa.getDocument());
 		viewHolder.textPozitie.setText(etapa.getPozitie() == null ? "?" : etapa.getPozitie());
+
+		setVisibilityOrdineEtape(viewHolder, etapa);
+		setVisibilityArticoleEtapa(viewHolder, etapa);
 
 		viewHolder.textPozitie.setOnClickListener(new OnClickListener() {
 
@@ -185,11 +189,62 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 			}
 		});
 
-		if (position % 2 == 0)
-			convertView.setBackgroundResource(R.drawable.shadow_dark);
-		else
-			convertView.setBackgroundResource(R.drawable.shadow_light);
+		viewHolder.btnArticole.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				getArticole(position);
+			}
+		});
+
+		if (etapa.isEtapaNoua()) {
+			convertView.setBackgroundResource(R.drawable.shadow_red);
+		} else {
+			if (position % 2 == 0)
+				convertView.setBackgroundResource(R.drawable.shadow_dark);
+			else
+				convertView.setBackgroundResource(R.drawable.shadow_light);
+		}
+
 		return convertView;
+	}
+
+	private void setVisibilityOrdineEtape(ViewHolder viewHolder, Etapa etapa) {
+
+		if (etapa.getTipBorderou() == TipBorderou.DISTRIBUTIE) {
+
+			if (etapa.getTipEtapa() != EnumTipEtapa.SFARSIT_INCARCARE && etapa.getTipEtapa() != EnumTipEtapa.START_BORD) {
+				viewHolder.textPozitie.setVisibility(View.VISIBLE);
+				viewHolder.textDescPozitie.setVisibility(View.VISIBLE);
+				viewHolder.clearIcon.setVisibility(View.VISIBLE);
+			} else {
+				viewHolder.textPozitie.setVisibility(View.INVISIBLE);
+				viewHolder.textDescPozitie.setVisibility(View.INVISIBLE);
+				viewHolder.clearIcon.setVisibility(View.INVISIBLE);
+			}
+
+		} else {
+			viewHolder.textPozitie.setVisibility(View.INVISIBLE);
+			viewHolder.textDescPozitie.setVisibility(View.INVISIBLE);
+			viewHolder.clearIcon.setVisibility(View.INVISIBLE);
+		}
+
+	}
+
+	public void setArticoleEtapaListener(ArticoleEtapaListener articoleListener) {
+		this.articoleListener = articoleListener;
+	}
+
+	private void getArticole(int position) {
+
+		ArticoleEtapaDialog articoleDialog = new ArticoleEtapaDialog(context, listEtape.get(position));
+		articoleDialog.setArticoleListener(this);
+		articoleDialog.show();
+
+		if (articoleListener != null)
+			articoleListener.articoleEtapaOpened();
+
 	}
 
 	private void saveEvent(int position, ViewHolder viewHolder) {
@@ -197,6 +252,8 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 		currentView = viewHolder;
 		currentPosition = position;
 		etapaCurenta = listEtape.get(position);
+
+		hasStartCursa();
 
 		if (etapaCurenta.getTipEtapa() == EnumTipEtapa.SOSIRE) {
 			if (hasStartCursa())
@@ -209,19 +266,14 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 
 	}
 
-	private void setPozitieLivrareVisibility(ViewHolder viewHolder, Etapa etapa) {
-		if (etapa.getNume().contains("INCEPUT") || etapa.getNume().contains("INCARCARE")) {
-			viewHolder.clearIcon.setVisibility(View.INVISIBLE);
-			viewHolder.textDescPozitie.setVisibility(View.INVISIBLE);
-			viewHolder.textPozitie.setVisibility(View.INVISIBLE);
-		} else {
-			viewHolder.clearIcon.setVisibility(View.VISIBLE);
-			viewHolder.textDescPozitie.setVisibility(View.VISIBLE);
-			viewHolder.textPozitie.setVisibility(View.VISIBLE);
-		}
-
+	private void setVisibilityArticoleEtapa(ViewHolder viewHolder, Etapa etapa) {
+		if (etapa.getTipBorderou() == TipBorderou.APROVIZIONARE)
+			viewHolder.btnArticole.setVisibility(View.VISIBLE);
+		else
+			viewHolder.btnArticole.setVisibility(View.INVISIBLE);
 	}
 
+	
 	private void getPozitieCurenta() {
 
 		HashMap<String, String> params = new HashMap<String, String>();
@@ -241,7 +293,7 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 			setSfarsitIncarcareEv(etapaCurenta.getDocument());
 			break;
 		case START_BORD:
-			checkOrdonareEtape();
+			checkConditiiEtape();
 			break;
 		case STOP_BORD:
 			showSfarsitCursaAlertDialog();
@@ -256,14 +308,23 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 
 	}
 
-	private void checkOrdonareEtape() {
-		if (BorderouriHelper.hasEtapeOrdonate(listEtape))
+	private void checkConditiiEtape() {
+
+		boolean hasEtapeOrdonate = BorderouriHelper.hasEtapeOrdonate(listEtape);
+		boolean hasSfarsitIncarcare = BorderouriHelper.hasSfarsitIncarcare(listEtape);
+
+		if (hasEtapeOrdonate && hasSfarsitIncarcare)
 			saveStartStopEvent(etapaCurenta.getTipEtapa());
-		else {
+		else if (!hasSfarsitIncarcare) {
+			CustomInfoDialog infoDialog = new CustomInfoDialog(context);
+			infoDialog.setInfoText("Marcati mai intai Sfarsit incarcare.");
+			infoDialog.show();
+		} else if (!hasEtapeOrdonate) {
 			CustomInfoDialog infoDialog = new CustomInfoDialog(context);
 			infoDialog.setInfoText("Completati mai intai ordinea livrarilor.");
 			infoDialog.show();
 		}
+
 	}
 
 	private void checkEtapeRamase() {
@@ -620,12 +681,6 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 	}
 
 	private void schimbaSfarsitCursa() {
-		/*
-		 * currentView = viewHolder; currentPosition = position; etapaCurenta =
-		 * listEtape.get(position);
-		 */
-
-
 
 		int ordMax = -1;
 		int poz = 0;
@@ -660,7 +715,6 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 
 		}
 
-		
 		notifyDataSetChanged();
 
 		performSaveNewEventClienti();
@@ -732,6 +786,18 @@ public class EtapeAdapter extends BaseAdapter implements OperatiiEvenimenteListe
 	@Override
 	public void pozitieSelected(String pozitie) {
 		setPozitieEtapa(pozitie);
+
+	}
+
+	@Override
+	public void articoleEtapaOpened() {
+
+	}
+
+	@Override
+	public void articoleEtapaClosed() {
+		if (articoleListener != null)
+			articoleListener.articoleEtapaClosed();
 
 	}
 

@@ -244,37 +244,10 @@ public class MainMenu extends Activity implements OperatiiBorderouriListener, Op
 
 				}
 
-				// evenimente
-				if (selectedBtnName.equalsIgnoreCase("Borderouri")) {
-
-					try {
-
-						Intent nextScreen = new Intent(MainMenu.this, BorderouriView.class);
-						startActivity(nextScreen);
-
-						finish();
-
-					} catch (Exception e) {
-						Toast.makeText(MainMenu.this, e.toString(), Toast.LENGTH_SHORT).show();
-					}
-
-				}
+				
 
 				// livrare
-				if (selectedBtnName.equalsIgnoreCase("Livrare")) {
-
-					try {
-
-						Intent nextScreen = new Intent(MainMenu.this, Livrare.class);
-						startActivity(nextScreen);
-
-						finish();
-
-					} catch (Exception e) {
-						Toast.makeText(MainMenu.this, e.toString(), Toast.LENGTH_SHORT).show();
-					}
-
-				}
+				
 
 				// etape
 				if (selectedBtnName.equalsIgnoreCase("Etape")) {

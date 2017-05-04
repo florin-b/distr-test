@@ -28,21 +28,28 @@ import com.distributie.adapters.EtapeAdapter;
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Etapa;
 import com.distributie.beans.Factura;
+import com.distributie.dialog.CustomInfoDialog;
 import com.distributie.enums.EnumOperatiiBorderou;
 import com.distributie.enums.EnumOperatiiEvenimente;
 import com.distributie.enums.EnumTipEtapa;
 import com.distributie.enums.TipBorderou;
+import com.distributie.listeners.ArticoleEtapaListener;
 import com.distributie.listeners.BorderouriDAOListener;
 import com.distributie.listeners.BorderouriListener;
+import com.distributie.listeners.InfoDialogListener;
 import com.distributie.listeners.OperatiiEtapeListener;
 import com.distributie.listeners.OperatiiEvenimenteListener;
 import com.distributie.model.BorderouriDAOImpl;
 import com.distributie.model.CurrentStatus;
+import com.distributie.model.EtapeDTI;
+import com.distributie.model.ExceptionHandler;
 import com.distributie.model.HandleJSONData;
 import com.distributie.model.OperatiiEvenimente;
 import com.distributie.model.UserInfo;
+import com.distributie.utils.Messages;
 
-public class AfisEtape extends Activity implements BorderouriDAOListener, OperatiiEvenimenteListener, OperatiiEtapeListener, BorderouriListener {
+public class AfisEtape extends Activity implements BorderouriDAOListener, OperatiiEvenimenteListener, OperatiiEtapeListener, BorderouriListener,
+		InfoDialogListener, ArticoleEtapaListener {
 
 	private ListView listViewEtape;
 	private OperatiiEvenimente opEvenimente;
@@ -58,10 +65,13 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 	private Button refreshListEtape;
 
 	private Handler handler = new Handler();
+	private boolean borderouDTI;
+	private EtapeDTI etapeDTI;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 
 		setTheme(R.style.LRTheme);
 		setContentView(R.layout.etape);
@@ -78,10 +88,16 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 		etapeAdapter = new EtapeAdapter(this, listEtape);
 		etapeAdapter.setOperatiiEtapeListener(this);
 		etapeAdapter.setBorderouriListener(this);
+		etapeAdapter.setArticoleEtapaListener(this);
+
+		etapeDTI = new EtapeDTI();
 
 		setupLayout();
 
 		getBorderouri();
+
+		if (UserInfo.getInstance().isDti())
+			startTimerTask();
 
 	}
 
@@ -111,9 +127,15 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 	}
 
 	private void startTimerTask() {
-		timer = new Timer();
-		initializeTimerTask();
-		timer.schedule(timerTask, 300000, 300000);
+
+		if (timer == null) {
+			timer = new Timer();
+			initializeTimerTask();
+			// timer.schedule(timerTask, 300000, 300000);
+
+			timer.schedule(timerTask, 30000, 30000);
+
+		}
 
 	}
 
@@ -123,6 +145,7 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 			timer.cancel();
 			timer = null;
 		}
+
 	}
 
 	public void initializeTimerTask() {
@@ -132,7 +155,7 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 			public void run() {
 				handler.post(new Runnable() {
 					public void run() {
-						listEtape.clear();
+
 						getBorderouri();
 
 					}
@@ -143,8 +166,13 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 
 	public void getBorderouri() {
 
+		if (UserInfo.getInstance().isDti())
+			etapeDTI.getEtapeFromListView(listViewEtape);
+
 		listEtape.clear();
-		checkBordScanningTime();
+
+		if (!UserInfo.getInstance().isDti())
+			checkBordScanningTime();
 
 		BorderouriDAOImpl bord = BorderouriDAOImpl.getInstance(this);
 		bord.setBorderouEventListener(AfisEtape.this);
@@ -178,8 +206,10 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		if (item.getItemId() == 0)
+		if (item.getItemId() == 0) {
+			stopTimerTask();
 			System.exit(0);
+		}
 
 		return super.onOptionsItemSelected(item);
 
@@ -196,16 +226,24 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 		HandleJSONData objListBorderouri = new HandleJSONData(this, borderouri);
 		ArrayList<Borderou> listBorderouri = objListBorderouri.decodeJSONBorderouri();
 
-		if (listBorderouri.size() > 0) {
+		if (!listBorderouri.isEmpty() && listBorderouri.get(0).getNumarBorderou() != "null") {
 
 			listViewEtape.setVisibility(View.VISIBLE);
 			textInfo.setVisibility(View.GONE);
 
 			borderouCurent = listBorderouri.get(0);
+			borderouDTI = listBorderouri.get(0).isAgentDTI();
+
 			getSfarsitIncarcareEv(listBorderouri.get(0).getNumarBorderou());
+
 		} else {
 			listViewEtape.setVisibility(View.GONE);
 			textInfo.setVisibility(View.VISIBLE);
+
+			if (!listBorderouri.isEmpty() && listBorderouri.get(0).getNumarBorderou() == "null")
+				borderouDTI = listBorderouri.get(0).isAgentDTI();
+
+			textInfo.setText(Messages.getSfarsitBordMessage(borderouDTI));
 			refreshListEtape.setVisibility(View.VISIBLE);
 
 		}
@@ -221,6 +259,7 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 		etapa.setNume("Sfarsit incarcare");
 		etapa.setPos(listEtape.size());
 		etapa.setDocument(borderouCurent.getNumarBorderou());
+		etapa.setTipBorderou(borderouCurent.getStandardTipBorderou());
 		etapa.setFactura(new Factura());
 
 		if (result.contains("SOF")) {
@@ -239,11 +278,12 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 
 		}
 
-		if (borderouCurent.getBordParent().equals("-1")) {
+		if (borderouCurent.getBordParent().equals("-1") && borderouCurent.getStandardTipBorderou() != TipBorderou.APROVIZIONARE) {
 			etapa = new Etapa();
 			etapa.setTipEtapa(EnumTipEtapa.START_BORD);
 			etapa.setNume("Inceput cursa");
 			etapa.setPos(listEtape.size());
+			etapa.setTipBorderou(borderouCurent.getStandardTipBorderou());
 			etapa.setDocument(borderouCurent.getNumarBorderou());
 			etapa.setFactura(new Factura());
 
@@ -267,7 +307,87 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 		HandleJSONData objListFacturi = new HandleJSONData(AfisEtape.this, facturi);
 		ArrayList<Factura> listFacturi = objListFacturi.decodeJSONFacturiBorderou();
 
-		if (listFacturi.size() > 0) {
+		if (borderouCurent.getStandardTipBorderou() == TipBorderou.DISTRIBUTIE) {
+			loadEtapeDistributie(listFacturi);
+
+		} else {
+
+			loadEtapeRest(listFacturi);
+		}
+
+	}
+
+	private void loadEtapeRest(ArrayList<Factura> listFacturi) {
+		if (!listFacturi.isEmpty()) {
+
+			listEtape.clear();
+
+			for (int i = 0; i < listFacturi.size(); i++) {
+
+				Etapa etapa = new Etapa();
+				etapa.setFactura(listFacturi.get(i));
+				etapa.setPos(listEtape.size());
+				etapa.setTipBorderou(borderouCurent.getStandardTipBorderou());
+				etapa.setDocument(borderouCurent.getNumarBorderou());
+				etapa.setTipEtapa(i == 0 ? EnumTipEtapa.START_BORD : EnumTipEtapa.SOSIRE);
+				etapa.setObservatii(i == 0 ? "INCEPUT CURSA" : "");
+				etapa.setPozitie(listFacturi.get(i).getPozitie());
+				listEtape.add(etapa);
+
+			}
+
+			int pozitieEtapaNoua = -1;
+
+			if (UserInfo.getInstance().isDti())
+				pozitieEtapaNoua = etapeDTI.verificaEtapeNoi(listEtape);
+
+			// actualizare start cursa
+			for (Etapa etapa : listEtape) {
+				if (etapa.getTipEtapa() == EnumTipEtapa.START_BORD) {
+					etapa.setSalvata(!listFacturi.get(0).getDataStartCursa().equals(""));
+					break;
+				}
+			}
+
+			if (ultimaEtapaId == null)
+				ultimaEtapaId = listEtape.get(listEtape.size() - 1).getCodClient();
+
+			setAutoNrEtapa(listEtape);
+
+			Collections.sort(listEtape);
+
+			listEtape.get(listEtape.size() - 1).setTipEtapa(EnumTipEtapa.STOP_BORD);
+			listEtape.get(listEtape.size() - 1).setObservatii("Sfarsit cursa");
+
+			etapeAdapter.setListEtape(listEtape);
+			etapeAdapter.setBorderou(borderouCurent);
+			listViewEtape.setAdapter(etapeAdapter);
+
+			int pozitieEtapaNesalvata = etapeDTI.getEtapaNesalvata(listEtape);
+
+			if (pozitieEtapaNesalvata != -1)
+				listViewEtape.setSelection(pozitieEtapaNesalvata);
+
+			if (pozitieEtapaNoua != -1) {
+				showInfoDialogEtapaNoua();
+				listViewEtape.setSelection(pozitieEtapaNoua);
+			}
+
+		}
+
+	}
+
+	private void showInfoDialogEtapaNoua() {
+		stopTimerTask();
+		CustomInfoDialog infoDialog = new CustomInfoDialog(this);
+		infoDialog.setInfoText("AU APARUT ELEMENTE NOI IN CURSA PE CARE O EFECTUATI!");
+		infoDialog.setInfoDialogListener(this);
+		infoDialog.show();
+
+	}
+
+	private void loadEtapeDistributie(ArrayList<Factura> listFacturi) {
+		if (!listFacturi.isEmpty()) {
 
 			sfarsitBordDate = null;
 			stopTimerTask();
@@ -308,7 +428,6 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 			etapeAdapter.setListEtape(listEtape);
 			etapeAdapter.setBorderou(borderouCurent);
 			listViewEtape.setAdapter(etapeAdapter);
-
 		}
 
 	}
@@ -377,16 +496,32 @@ public class AfisEtape extends Activity implements BorderouriDAOListener, Operat
 
 		getBorderouri();
 		sfarsitBordDate = new Date();
-		if (timer == null) {
-			startTimerTask();
-		}
+		startTimerTask();
 
 	}
 
 	@Override
 	public void verificaBordeoruri() {
-		if (timer == null)
+		startTimerTask();
+
+	}
+
+	@Override
+	public void infoDialogTextRead() {
+		startTimerTask();
+	}
+
+	@Override
+	public void articoleEtapaOpened() {
+		stopTimerTask();
+
+	}
+
+	@Override
+	public void articoleEtapaClosed() {
+		if (borderouCurent.getStandardTipBorderou() == TipBorderou.APROVIZIONARE) {
 			startTimerTask();
+		}
 
 	}
 

@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
-
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,23 +36,28 @@ import android.telephony.TelephonyManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.distributie.adapters.SoferiAdapter;
+import com.distributie.beans.BeanSofer;
 import com.distributie.beans.InitStatus;
 import com.distributie.enums.EnumNetworkStatus;
 import com.distributie.enums.EnumOperatiiLogon;
 import com.distributie.listeners.AsyncTaskListener;
+import com.distributie.listeners.SoferiListener;
 import com.distributie.model.HandleJSONData;
-
 import com.distributie.model.LogonImpl;
 import com.distributie.model.LogonListener;
+import com.distributie.model.OperatiiSoferi;
 import com.distributie.model.UserInfo;
 
-public class LogonActivity extends Activity implements LogonListener, AsyncTaskListener {
+public class LogonActivity extends Activity implements LogonListener, AsyncTaskListener, SoferiListener {
 
 	int val = 0;
 
@@ -64,6 +69,9 @@ public class LogonActivity extends Activity implements LogonListener, AsyncTaskL
 	private boolean allowLogon = false;
 	ImageView logonImage;
 	private Timer myTimer;
+
+	private OperatiiSoferi opSoferi;
+	private Spinner spinnerSoferi;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +105,10 @@ public class LogonActivity extends Activity implements LogonListener, AsyncTaskL
 
 			buildVer = String.valueOf(pInfo.versionCode);
 
+			spinnerSoferi = (Spinner) findViewById(R.id.spinnerSoferi);
+			spinnerSoferi.setVisibility(View.VISIBLE);
+			setSpinnerSoferiListener();
+
 			progressBarWheel = (ProgressBar) findViewById(R.id.progress_bar_wheel);
 			progressBarWheel.setVisibility(View.INVISIBLE);
 			logonImage = (ImageView) findViewById(R.id.logonImage);
@@ -108,11 +120,16 @@ public class LogonActivity extends Activity implements LogonListener, AsyncTaskL
 			String deviceId = getDeviceId();
 
 			txtDeviceId.setText(deviceId.replaceAll(".{3}", "$0 "));
-			// getCodSofer(deviceId);
 
-			//init - 00120509
+			opSoferi = new OperatiiSoferi(this);
+			opSoferi.setSoferiListener(this);
+			opSoferi.getSoferi();
+
+			 //getCodSofer(deviceId);
+			 
+			getCodSofer("860998032233102");
 			
-			getCodSofer("355860061488282");
+			 
 
 		} catch (Exception ex) {
 			Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
@@ -472,7 +489,6 @@ public class LogonActivity extends Activity implements LogonListener, AsyncTaskL
 
 	}
 
-
 	boolean noActivity(InitStatus initStatus) {
 		return initStatus.getClient() == null;
 	}
@@ -515,6 +531,36 @@ public class LogonActivity extends Activity implements LogonListener, AsyncTaskL
 	@Override
 	public void onTaskComplete(String methodName, String result, EnumNetworkStatus networkStatus) {
 		Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+
+	}
+
+	
+	private void setSpinnerSoferiListener()
+	{
+		spinnerSoferi.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				
+				BeanSofer sofer = (BeanSofer) parent.getAdapter().getItem(position);
+				getCodSofer(sofer.getCodTableta());
+				
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				
+				
+			}
+		});
+	}
+	
+	@Override
+	public void soferiComplete(List<BeanSofer> listSoferi) {
+		
+		SoferiAdapter soferiAdapter = new SoferiAdapter(getApplicationContext(), listSoferi);
+		spinnerSoferi.setAdapter(soferiAdapter);
+		allowLogon = true;
 
 	}
 

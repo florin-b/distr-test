@@ -1,16 +1,18 @@
 package com.distributie.beans;
 
-public class ArticoleFactura {
+import com.distributie.enums.EnumTipOperatie;
+
+public class Articol {
 
 	private String nume;
 	private String cantitate;
 	private String umCant;
-	private String tipOperatiune;
+	private EnumTipOperatie tipOperatiune;
 	private String departament;
 	private String greutate;
 	private String umGreutate;
 
-	public ArticoleFactura() {
+	public Articol() {
 
 	}
 
@@ -38,11 +40,11 @@ public class ArticoleFactura {
 		this.umCant = umCant;
 	}
 
-	public String getTipOperatiune() {
+	public EnumTipOperatie getTipOperatiune() {
 		return tipOperatiune;
 	}
 
-	public void setTipOperatiune(String tipOperatiune) {
+	public void setTipOperatiune(EnumTipOperatie tipOperatiune) {
 		this.tipOperatiune = tipOperatiune;
 	}
 
@@ -69,11 +71,5 @@ public class ArticoleFactura {
 	public void setUmGreutate(String umGreutate) {
 		this.umGreutate = umGreutate;
 	}
-
-	
-	
-	
-	
-	
 
 }

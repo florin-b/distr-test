@@ -10,6 +10,7 @@ public class Borderou {
 	private String tipBorderou;
 	private TipBorderou stringTipBorderou;
 	private String bordParent;
+	private boolean agentDTI;
 
 	public Borderou() {
 
@@ -79,6 +80,14 @@ public class Borderou {
 		}
 
 		return borderou;
+	}
+
+	public boolean isAgentDTI() {
+		return agentDTI;
+	}
+
+	public void setAgentDTI(boolean agentDTI) {
+		this.agentDTI = agentDTI;
 	}
 
 }

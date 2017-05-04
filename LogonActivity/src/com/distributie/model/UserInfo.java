@@ -13,6 +13,7 @@ public class UserInfo {
 	private String status;
 	private String departament;
 	private String tipAcces;
+	private boolean dti;
 
 	private static UserInfo instance = new UserInfo();
 
@@ -77,6 +78,14 @@ public class UserInfo {
 
 	public void setTipAcces(String tipAcces) {
 		this.tipAcces = tipAcces;
+	}
+
+	public boolean isDti() {
+		return dti;
+	}
+
+	public void setDti(boolean dti) {
+		this.dti = dti;
 	}
 
 }

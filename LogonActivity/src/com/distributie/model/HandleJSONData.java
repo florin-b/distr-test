@@ -6,12 +6,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.distributie.beans.ArticoleFactura;
+import com.distributie.beans.Articol;
 import com.distributie.beans.Borderou;
 import com.distributie.beans.Eveniment;
 import com.distributie.beans.EvenimentBorderou;
 import com.distributie.beans.Factura;
 import com.distributie.beans.InitStatus;
+import com.distributie.enums.EnumTipOperatie;
 
 import android.content.Context;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ public class HandleJSONData {
 				unBorderou.setEvenimentBorderou(borderouObject.getString("evenimentBorderou"));
 				unBorderou.setTipBorderou(borderouObject.getString("tipBorderou"));
 				unBorderou.setBordParent(borderouObject.getString("bordParent"));
+				unBorderou.setAgentDTI(Boolean.valueOf(borderouObject.getString("agentDTI")));
 				objectsList.add(unBorderou);
 
 			}
@@ -172,9 +174,9 @@ public class HandleJSONData {
 
 	}
 
-	public ArrayList<ArticoleFactura> decodeJSONArticoleFactura() {
-		ArticoleFactura articol = null;
-		ArrayList<ArticoleFactura> objectList = new ArrayList<ArticoleFactura>();
+	public ArrayList<Articol> decodeJSONArticoleFactura() {
+		Articol articol = null;
+		ArrayList<Articol> objectList = new ArrayList<Articol>();
 
 		try {
 			jsonObject = new JSONArray(JSONString);
@@ -182,12 +184,12 @@ public class HandleJSONData {
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject articolObject = jsonObject.getJSONObject(i);
 
-				articol = new ArticoleFactura();
+				articol = new Articol();
 
 				articol.setNume(articolObject.getString("nume"));
 				articol.setCantitate(articolObject.getString("cantitate"));
 				articol.setUmCant(articolObject.getString("umCant"));
-				articol.setTipOperatiune(articolObject.getString("tipOperatiune"));
+				articol.setTipOperatiune(getTipOperatie(articolObject.getString("tipOperatiune")));
 				articol.setDepartament(articolObject.getString("departament"));
 				articol.setGreutate(articolObject.getString("greutate"));
 				articol.setUmGreutate(articolObject.getString("umGreutate"));
@@ -222,6 +224,7 @@ public class HandleJSONData {
 				userInfo.setId(sb.toString());
 				userInfo.setNume(jsonObject.get("nume").toString());
 				userInfo.setFiliala(jsonObject.get("filiala").toString());
+				userInfo.setDti(Boolean.valueOf(jsonObject.get("dti").toString()));
 
 				InitStatus initStatus = InitStatus.getInstance();
 
@@ -243,6 +246,13 @@ public class HandleJSONData {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static EnumTipOperatie getTipOperatie(String strOperatie) {
+		if (strOperatie.equalsIgnoreCase("inc"))
+			return EnumTipOperatie.INCARCARE;
+
+		return EnumTipOperatie.DESCARCARE;
 	}
 
 }
